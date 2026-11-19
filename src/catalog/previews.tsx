@@ -14,10 +14,14 @@ import {
   DialogTrigger,
 } from "../ui/Dialog";
 import { SimpleEmptyState } from "../ui/EmptyState";
+import { FileTypeIcon } from "../ui/FileTypeIcon";
 import { FormField } from "../ui/FormField";
+import { CopyIcon, TrashIcon } from "../ui/icons";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
+import { RowActionMenu } from "../ui/RowActionMenu";
 import { SearchInput } from "../ui/SearchInput";
 import { SelectBox, type SelectBoxOption } from "../ui/SelectBox";
+import { TablePagination } from "../ui/TablePagination";
 import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
 import { TextInput } from "../ui/TextInput";
 
@@ -294,6 +298,58 @@ function BreadcrumbPreview() {
   );
 }
 
+function RowActionMenuPreview() {
+  const [feedback, setFeedback] = useState("");
+  return (
+    <div className="w-full max-w-sm">
+      <div className="divide-y divide-catalog-line rounded-lg border border-catalog-line bg-white px-3">
+        <div className="flex min-h-12 items-center gap-2.5">
+          <FileTypeIcon extension="xlsx" nativeTooltip={false} />
+          <span className="min-w-0 flex-1 truncate text-sm">月次レポート.xlsx</span>
+          <RowActionMenu
+            title="月次レポート.xlsx"
+            actions={[
+              {
+                label: "ファイル名をコピー",
+                icon: <CopyIcon />,
+                onSelect: () => setFeedback("ファイル名をコピーする操作を選びました。"),
+              },
+              {
+                label: "削除",
+                icon: <TrashIcon />,
+                actionClassName: "text-rose-700 hover:bg-rose-50 focus-visible:ring-rose-600",
+                onSelect: () => setFeedback("削除する操作を選びました。"),
+              },
+            ]}
+          />
+        </div>
+        <div className="flex min-h-12 items-center gap-2.5">
+          <FileTypeIcon extension="pdf" nativeTooltip={false} />
+          <span className="min-w-0 flex-1 truncate text-sm text-text-muted">閲覧専用.pdf</span>
+          <RowActionMenu title="閲覧専用.pdf" actions={[]} disabled />
+        </div>
+      </div>
+      <p className="demo-output mt-3" role="status">
+        {feedback}
+      </p>
+    </div>
+  );
+}
+
+function PaginationPreview() {
+  const [page, setPage] = useState(1);
+  return (
+    <div className="grid w-full max-w-lg gap-3">
+      <div className="rounded-lg border border-catalog-line bg-white">
+        <TablePagination page={page} perPage={5} total={13} onPageChange={setPage} />
+      </div>
+      <div className="rounded-lg border border-catalog-line bg-white">
+        <TablePagination page={1} perPage={5} total={0} onPageChange={() => {}} />
+      </div>
+    </div>
+  );
+}
+
 export const previews = {
   "app-button": ButtonPreview,
   "text-input": TextPreview,
@@ -304,6 +360,8 @@ export const previews = {
   dialog: DialogPreview,
   "loading-spinner": SpinnerPreview,
   "empty-state": EmptyPreview,
+  "row-action-menu": RowActionMenuPreview,
+  "table-pagination": PaginationPreview,
   breadcrumb: BreadcrumbPreview,
 };
 
@@ -379,6 +437,23 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
       return <LoadingSpinner size="md" />;
     case "empty-state":
       return <SimpleEmptyState message="資料がありません" className="!py-0" />;
+    case "row-action-menu":
+      return (
+        <div className="flex max-w-full items-center gap-2 rounded-lg border border-catalog-line bg-white px-2 text-xs">
+          <FileTypeIcon extension="xlsx" nativeTooltip={false} className="size-5" />
+          <span className="truncate">月次レポート.xlsx</span>
+          <RowActionMenu
+            title="月次レポート.xlsx"
+            actions={[{ label: "コピー", icon: <CopyIcon />, onSelect: () => {} }]}
+          />
+        </div>
+      );
+    case "table-pagination":
+      return (
+        <div className="w-full rounded-lg border border-catalog-line bg-white">
+          <TablePagination page={1} perPage={5} total={13} onPageChange={() => {}} />
+        </div>
+      );
     case "breadcrumb":
       return (
         <SimpleBreadcrumb

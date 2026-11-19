@@ -3,10 +3,12 @@ import {
   CheckSquare,
   ChevronRight,
   ChevronsUpDown,
+  EllipsisVertical,
   FileSearch,
   LoaderCircle,
   MousePointer2,
   PanelTop,
+  StepForward,
   Search,
   Tag,
   type LucideIcon,
@@ -244,6 +246,59 @@ import {
 <SimpleEmptyState
   message="資料がありません"
   subMessage="最初の資料を追加すると、ここに表示されます。"
+/>`,
+  },
+  {
+    id: "row-action-menu",
+    name: "RowActionMenu",
+    label: "三点メニュー",
+    category: "操作",
+    icon: EllipsisVertical,
+    description: "一覧の行に対する補助操作をまとめます。",
+    guidance: [
+      "title に対象の名前を渡し、どの行のメニューか分かるようにします。",
+      "頻度の高い項目を上に置き、削除などの操作は色と文言で区別します。",
+      "上下キーで項目を移動し、Enter で実行、Esc で閉じて起点に戻れます。",
+    ],
+    variants: ["通常", "削除", "無効"],
+    file: "RowActionMenu.tsx",
+    code: `import { RowActionMenu } from "./ui/RowActionMenu";
+import { CopyIcon, TrashIcon } from "./ui/icons";
+
+<RowActionMenu
+  title={file.name}
+  actions={[
+    { label: "ファイル名をコピー", icon: <CopyIcon />, onSelect: copyName },
+    {
+      label: "削除",
+      icon: <TrashIcon />,
+      actionClassName: "text-rose-700 hover:bg-rose-50 focus-visible:ring-rose-600",
+      onSelect: confirmRemoval,
+    },
+  ]}
+/>`,
+  },
+  {
+    id: "table-pagination",
+    name: "TablePagination",
+    label: "ページ送り",
+    category: "ナビゲーション",
+    icon: StepForward,
+    description: "一覧の表示範囲と、前後のページへの移動を提供します。",
+    guidance: [
+      "page は1から数え、total には絞り込み後の件数を指定します。",
+      "検索条件が変わったら最初のページに戻し、削除で最終ページがなくなった場合は手前のページを表示します。",
+      "先頭・最終ページ、0件のときは、移動できない方向のボタンが無効になります。",
+    ],
+    variants: ["先頭ページ", "途中のページ", "最終ページ", "0件"],
+    file: "TablePagination.tsx",
+    code: `import { TablePagination } from "./ui/TablePagination";
+
+<TablePagination
+  page={page}
+  perPage={5}
+  total={filteredFiles.length}
+  onPageChange={setPage}
 />`,
   },
   {

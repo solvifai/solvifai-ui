@@ -9,6 +9,7 @@ import {
   Command,
   Copy,
   Github,
+  FolderOpen,
   LayoutGrid,
   Menu,
   Palette,
@@ -21,6 +22,7 @@ import { SearchInput } from "../ui/SearchInput";
 import { SimpleEmptyState } from "../ui/EmptyState";
 import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
 import { categories, components, type Category, type ComponentEntry } from "./components";
+import { FileList } from "./FileList";
 import guide from "./guidelines.md?raw";
 import guideUrl from "./guidelines.md?url&no-inline";
 import { brandSymbolUrl, Icons } from "./Icons";
@@ -37,6 +39,7 @@ const categoryLinks = {
 
 const links = [
   { href: "#components", label: "コンポーネント", icon: LayoutGrid },
+  { href: "#file-list", label: "ファイル一覧サンプル", icon: FolderOpen },
   { href: "#tokens", label: "デザイントークン", icon: Palette },
   { href: "#icons", label: "SolvifAIアイコン", icon: Shapes },
   { href: "#guidelines", label: "UIガイド", icon: BookOpen },
@@ -400,6 +403,7 @@ export function App() {
 
   let content = <Catalog category={category} />;
   if (entry) content = <Detail key={entry.id} entry={entry} />;
+  if (hash === "#file-list") content = <FileList />;
   if (hash === "#tokens") content = <Tokens />;
   if (hash === "#guidelines") content = <Guidelines />;
   if (hash === "#icons") content = <Icons sourceBase={repository + "/blob/main/src/ui"} />;
