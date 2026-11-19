@@ -34,8 +34,10 @@ export function Icons({ sourceBase }: { sourceBase: string }) {
     .filter(({ label }) => filter === "すべて" || label === filter)
     .map(({ label, entries }) => ({
       label,
-      entries: entries.filter(([name, component]) =>
-        `${name} ${component} ${label}`.toLowerCase().includes(search),
+      entries: entries.filter(([name, component, extensions]) =>
+        `${name} ${component} ${label} ${extensions?.map((ext) => `.${ext}`).join(" ") ?? ""}`
+          .toLowerCase()
+          .includes(search),
       ),
     }))
     .filter(({ entries }) => entries.length > 0);
@@ -116,19 +118,31 @@ export function Icons({ sourceBase }: { sourceBase: string }) {
             <section className="mt-6" key={label}>
               <h3 className="mb-3 text-sm font-semibold">{label}</h3>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                {entries.map(([name, component]) => {
+                {entries.map(([name, component, extensions]) => {
                   const Icon = icons[component];
                   return (
-                    <article className="token" key={component}>
+                    <article className="token" key={name + component}>
                       <div
                         className="flex h-16 items-center justify-center bg-product-bg text-catalog-ink"
                         aria-hidden="true"
                       >
-                        <Icon className="size-6" active />
+                        <Icon
+                          className="size-6"
+                          active
+                          extension={extensions?.[0]}
+                          nativeTooltip={false}
+                        />
                       </div>
                       <div>
                         <strong>{name}</strong>
-                        <code>{component}</code>
+                        <code>
+                          {extensions
+                            ? extensions
+                                .slice(0, 3)
+                                .map((ext) => `.${ext}`)
+                                .join(" / ") || "形式不明・その他"
+                            : component}
+                        </code>
                       </div>
                     </article>
                   );
@@ -140,6 +154,10 @@ export function Icons({ sourceBase }: { sourceBase: string }) {
         <div className="flex flex-wrap gap-x-5">
           <a className="source-link" href={sourceBase + "/icons.tsx"}>
             共通アイコンのReact実装
+            <ArrowUpRight size={15} aria-hidden="true" />
+          </a>
+          <a className="source-link" href={sourceBase + "/FileTypeIcon.tsx"}>
+            ファイル形式アイコンのReact実装
             <ArrowUpRight size={15} aria-hidden="true" />
           </a>
           <a className="source-link" href={sourceBase + "/sidebar-icons.tsx"}>

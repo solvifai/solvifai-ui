@@ -1,16 +1,21 @@
+import { FileTypeIcon, fileTypes } from "../ui/FileTypeIcon";
 import { FolderIcon } from "../ui/FolderIcon";
 import { PinIcon } from "../ui/PinIcon";
 import * as commonIcons from "../ui/icons";
 import * as sidebarIcons from "../ui/sidebar-icons";
 
-export const icons = { ...commonIcons, ...sidebarIcons, FolderIcon, PinIcon };
+export const icons = { ...commonIcons, ...sidebarIcons, FileTypeIcon, FolderIcon, PinIcon };
 
 type IconGroup = {
   label: string;
-  entries: readonly (readonly [label: string, name: keyof typeof icons])[];
+  entries: readonly (readonly [
+    label: string,
+    name: keyof typeof icons,
+    extensions?: readonly string[],
+  ])[];
 };
 
-export const iconGroups = [
+export const iconGroups: readonly IconGroup[] = [
   {
     label: "操作",
     entries: [
@@ -76,6 +81,10 @@ export const iconGroups = [
     ],
   },
   {
+    label: "ファイル形式",
+    entries: fileTypes.map(({ label, extensions }) => [label, "FileTypeIcon", extensions]),
+  },
+  {
     label: "サイドバー",
     entries: [
       ["成果物", "IconDeliverableV2"],
@@ -95,4 +104,4 @@ export const iconGroups = [
       ["追加", "IconPlusSidebar"],
     ],
   },
-] as const satisfies readonly IconGroup[];
+];
