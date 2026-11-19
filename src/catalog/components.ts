@@ -2,6 +2,7 @@ import {
   AlignLeft,
   CheckSquare,
   ChevronRight,
+  ChevronsUpDown,
   FileSearch,
   LoaderCircle,
   MousePointer2,
@@ -99,6 +100,32 @@ import { TextInput } from "./ui/TextInput";
 />`,
   },
   {
+    id: "select-box",
+    name: "SelectBox",
+    label: "セレクトボックス",
+    category: "入力",
+    icon: ChevronsUpDown,
+    description: "決められた選択肢から1つを選びます。",
+    guidance: [
+      "ラベルに何を選ぶかを書き、フォームの値には選択肢ごとに一意の value を指定します。",
+      '選択を必須にする場合は required を指定し、未選択の案内には value="" の無効な選択肢を使います。',
+      "エラー時は aria-invalid を指定し、aria-describedby で修正方法を示す文に関連付けます。",
+    ],
+    variants: ["未選択", "選択済み", "エラー", "無効"],
+    file: "SelectBox.tsx",
+    code: `import { FormField } from "./ui/FormField";
+import { SelectBox } from "./ui/SelectBox";
+
+<FormField label="並び順" htmlFor="sort">
+  <SelectBox id="sort" name="sort" defaultValue="" required>
+    <option value="" disabled>選択してください</option>
+    <option value="recent">新しい順</option>
+    <option value="oldest">古い順</option>
+    <option value="name">名前順</option>
+  </SelectBox>
+</FormField>`,
+  },
+  {
     id: "checkbox",
     name: "Checkbox",
     label: "チェックボックス",
@@ -108,7 +135,7 @@ import { TextInput } from "./ui/TextInput";
     guidance: [
       "選択対象がわかるラベルを隣に表示し、ariaLabel にも指定します。",
       "一覧の全選択では、一部だけが選択された状態に indeterminate を使います。",
-      "選択肢を1件に限定する場合は、ラジオボタンを使います。",
+      "1件だけ選ぶ場合はセレクトボックスを使えます。少数の選択肢を常に見せたい場合はラジオボタンを使います。",
     ],
     variants: ["Unchecked", "Checked", "Mixed", "Disabled"],
     file: "Checkbox.tsx",
