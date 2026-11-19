@@ -74,25 +74,10 @@ button:not(:disabled) {
   font-weight: 650;
 }
 .brand-mark {
-  display: grid;
   width: 28px;
   height: 28px;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 3px;
-  padding: 6px;
+  object-fit: contain;
   margin-right: 5px;
-  border-radius: 8px;
-  background: var(--background-image-brand-gradient);
-}
-.brand-mark span {
-  border-radius: 1px;
-  background: #fff;
-}
-.brand-mark span:nth-child(2) {
-  opacity: 0.55;
-}
-.brand-mark span:nth-child(3) {
-  opacity: 0.8;
 }
 
 .github-link {
@@ -535,6 +520,9 @@ button:not(:disabled) {
   border: 1px solid var(--color-catalog-line);
   border-radius: 13px;
   overflow: hidden;
+}
+.preview-box:has([role="listbox"]) {
+  overflow: visible;
 }
 .preview-bar {
   padding: 12px 16px;

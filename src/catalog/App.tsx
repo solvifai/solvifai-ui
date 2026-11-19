@@ -12,6 +12,7 @@ import {
   LayoutGrid,
   Menu,
   Palette,
+  Shapes,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -22,6 +23,7 @@ import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
 import { categories, components, type Category, type ComponentEntry } from "./components";
 import guide from "./guidelines.md?raw";
 import guideUrl from "./guidelines.md?url&no-inline";
+import { brandSymbolUrl, Icons } from "./Icons";
 import { CardPreview, HeroPreview, previews } from "./previews";
 
 const repository = "https://github.com/solvifai/solvifai-ui";
@@ -36,6 +38,7 @@ const categoryLinks = {
 const links = [
   { href: "#components", label: "コンポーネント", icon: LayoutGrid },
   { href: "#tokens", label: "デザイントークン", icon: Palette },
+  { href: "#icons", label: "SolvifAIアイコン", icon: Shapes },
   { href: "#guidelines", label: "UIガイド", icon: BookOpen },
 ];
 
@@ -374,8 +377,7 @@ export function App() {
   const entry = components.find(({ id }) => "#" + id === hash);
   const category = categories.find((item) => categoryLinks[item] === hash) ?? "すべて";
   const title =
-    entry?.label ??
-    (hash === "#tokens" ? "デザイントークン" : hash === "#guidelines" ? "UIガイド" : "");
+    entry?.label ?? links.find((link) => link.href === hash && hash !== "#components")?.label ?? "";
 
   useEffect(() => {
     const onHash = () => {
@@ -400,6 +402,8 @@ export function App() {
   if (entry) content = <Detail key={entry.id} entry={entry} />;
   if (hash === "#tokens") content = <Tokens />;
   if (hash === "#guidelines") content = <Guidelines />;
+  if (hash === "#icons")
+    content = <Icons sourceHref={repository + "/blob/main/src/ui/icons.tsx"} />;
 
   return (
     <>
@@ -426,12 +430,7 @@ export function App() {
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
           <a className="wordmark" href="#components" onClick={() => setMobileOpen(false)}>
-            <span className="brand-mark" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-              <span />
-            </span>
+            <img className="brand-mark" src={brandSymbolUrl} alt="" />
             SolvifAI <span>UI</span>
           </a>
         </div>

@@ -107,9 +107,10 @@ import { TextInput } from "./ui/TextInput";
     icon: ChevronsUpDown,
     description: "決められた選択肢から1つを選びます。",
     guidance: [
-      "ラベルに何を選ぶかを書き、フォームの値には選択肢ごとに一意の value を指定します。",
-      '選択を必須にする場合は required を指定し、未選択の案内には value="" の無効な選択肢を使います。',
-      "エラー時は aria-invalid を指定し、aria-describedby で修正方法を示す文に関連付けます。",
+      "FormField のラベルで選ぶ項目を示し、各選択肢に一意の value を指定します。",
+      '未選択は value="" で表します。必須項目は required を指定し、送信時にフォーム側で値を検証します。',
+      "エラー時は invalid を指定し、describedBy で修正方法を示す文に関連付けます。",
+      "上下キーで選択肢を移動し、Enter で選択、Esc で閉じられます。",
     ],
     variants: ["未選択", "選択済み", "エラー", "無効"],
     file: "SelectBox.tsx",
@@ -117,12 +118,17 @@ import { TextInput } from "./ui/TextInput";
 import { SelectBox } from "./ui/SelectBox";
 
 <FormField label="並び順" htmlFor="sort">
-  <SelectBox id="sort" name="sort" defaultValue="" required>
-    <option value="" disabled>選択してください</option>
-    <option value="recent">新しい順</option>
-    <option value="oldest">古い順</option>
-    <option value="name">名前順</option>
-  </SelectBox>
+  <SelectBox
+    id="sort"
+    name="sort"
+    value={sort}
+    onChange={setSort}
+    options={[
+      { value: "recent", label: "新しい順" },
+      { value: "oldest", label: "古い順" },
+      { value: "name", label: "名前順" },
+    ]}
+  />
 </FormField>`,
   },
   {

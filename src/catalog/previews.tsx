@@ -17,7 +17,7 @@ import { SimpleEmptyState } from "../ui/EmptyState";
 import { FormField } from "../ui/FormField";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { SearchInput } from "../ui/SearchInput";
-import { SelectBox } from "../ui/SelectBox";
+import { SelectBox, type SelectBoxOption } from "../ui/SelectBox";
 import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
 import { TextInput } from "../ui/TextInput";
 
@@ -115,7 +115,24 @@ function SearchPreview() {
   );
 }
 
+const sortOptions = [
+  { value: "recent", label: "新しい順" },
+  { value: "oldest", label: "古い順" },
+  { value: "name", label: "名前順" },
+] satisfies SelectBoxOption[];
+const viewOptions = [
+  { value: "list", label: "一覧" },
+  { value: "grid", label: "グリッド" },
+] satisfies SelectBoxOption[];
+const categoryOptions = [
+  { value: "report", label: "レポート" },
+  { value: "minutes", label: "議事録" },
+] satisfies SelectBoxOption[];
+const permissionOptions = [{ value: "read", label: "閲覧のみ" }] satisfies SelectBoxOption[];
+
 function SelectBoxPreview() {
+  const [sort, setSort] = useState("");
+  const [view, setView] = useState("list");
   const [category, setCategory] = useState("");
   const id = useId();
   const invalid = category === "";
@@ -123,36 +140,21 @@ function SelectBoxPreview() {
   return (
     <div className="demo-form">
       <FormField label="並び順" htmlFor={id + "-sort"}>
-        <SelectBox id={id + "-sort"} defaultValue="">
-          <option value="" disabled>
-            選択してください
-          </option>
-          <option value="recent">新しい順</option>
-          <option value="oldest">古い順</option>
-          <option value="name">名前順</option>
-        </SelectBox>
+        <SelectBox id={id + "-sort"} options={sortOptions} value={sort} onChange={setSort} />
       </FormField>
       <FormField label="表示形式" htmlFor={id + "-view"}>
-        <SelectBox id={id + "-view"} defaultValue="list">
-          <option value="list">一覧</option>
-          <option value="grid">グリッド</option>
-        </SelectBox>
+        <SelectBox id={id + "-view"} options={viewOptions} value={view} onChange={setView} />
       </FormField>
       <FormField label="カテゴリ（必須）" htmlFor={id + "-category"}>
         <SelectBox
           id={id + "-category"}
-          aria-invalid={invalid || undefined}
-          aria-describedby={invalid ? id + "-error" : undefined}
-          required
+          options={categoryOptions}
           value={category}
-          onChange={(event) => setCategory(event.currentTarget.value)}
-        >
-          <option value="" disabled>
-            選択してください
-          </option>
-          <option value="report">レポート</option>
-          <option value="minutes">議事録</option>
-        </SelectBox>
+          onChange={setCategory}
+          invalid={invalid}
+          describedBy={invalid ? id + "-error" : undefined}
+          required
+        />
         {invalid ? (
           <p id={id + "-error"} className="demo-error">
             カテゴリを選択してください。
@@ -160,9 +162,13 @@ function SelectBoxPreview() {
         ) : null}
       </FormField>
       <FormField label="アクセス権限" htmlFor={id + "-permission"}>
-        <SelectBox id={id + "-permission"} defaultValue="read" disabled>
-          <option value="read">閲覧のみ</option>
-        </SelectBox>
+        <SelectBox
+          id={id + "-permission"}
+          options={permissionOptions}
+          value="read"
+          onChange={() => {}}
+          disabled
+        />
       </FormField>
     </div>
   );
@@ -330,10 +336,12 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
       return (
         <div className="mini-form">
           <FormField label="並び順">
-            <SelectBox className="h-9 text-sm" defaultValue="recent">
-              <option value="recent">新しい順</option>
-              <option value="oldest">古い順</option>
-            </SelectBox>
+            <SelectBox
+              className="min-h-9"
+              options={sortOptions}
+              value="recent"
+              onChange={() => {}}
+            />
           </FormField>
         </div>
       );
