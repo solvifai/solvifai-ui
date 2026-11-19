@@ -18,14 +18,17 @@ import {
   ListChecks,
   LoaderCircle,
   MousePointer2,
+  PanelRight,
   PanelTop,
   Paperclip,
+  Rows3,
   StepForward,
   Search,
   Tag,
   TextCursorInput,
   ToggleRight,
   Table2,
+  TriangleAlert,
   Users,
   Upload,
   type LucideIcon,
@@ -727,6 +730,92 @@ import { TextArea } from "./ui/TextArea";
     setWidth((previous) => Math.max(120, Math.min(400, previous + delta)))
   }
 />`,
+  },
+  {
+    id: "alert-banner",
+    name: "AlertBanner",
+    label: "アラートバナー",
+    category: "状態表示",
+    icon: TriangleAlert,
+    description: "プロジェクト編集の情報取得エラーのように、その場に通知と対処方法を表示します。",
+    guidance: [
+      "情報を取得できない場合は error、編集範囲の制限などの注意事項には warning を使います。",
+      "何が起きたか、入力が保持されているか、どう対処できるかを短く伝えます。",
+      "再取得などその場でできる操作は action に渡します。",
+    ],
+    variants: ["エラー", "再取得", "注意"],
+    file: "AlertBanner.tsx",
+    code: `import { AlertBanner } from "./ui/AlertBanner";
+import { AppButton } from "./ui/AppButton";
+
+<AlertBanner
+  tone="error"
+  action={
+    <AppButton disabled={refreshing} onClick={retry}>
+      {refreshing ? "再取得中…" : "再取得"}
+    </AppButton>
+  }
+>
+  最新情報を取得できませんでした。入力内容は保持しています。
+</AlertBanner>`,
+  },
+  {
+    id: "skeleton",
+    name: "Skeleton",
+    label: "スケルトン",
+    category: "状態表示",
+    icon: Rows3,
+    description: "成果物の一括編集で修正案を待つ間、結果が出る位置に読み込み状態を表示します。",
+    guidance: [
+      "読み込み中の箇所に置き、結果が届いたら同じ位置に内容を表示します。",
+      "label には「修正案作成中」のように、何を待っているかを指定します。",
+      "動きを減らす端末設定では、バーを静止した状態で表示します。",
+    ],
+    variants: ["作成中", "結果に切り替え", "動きを減らす"],
+    file: "Skeleton.tsx",
+    code: `import { Skeleton } from "./ui/Skeleton";
+
+{isDrafting ? (
+  <Skeleton label="修正案作成中…" />
+) : (
+  <DraftResult content={draft} />
+)}`,
+  },
+  {
+    id: "drawer",
+    name: "Drawer",
+    label: "ドロワー",
+    category: "ナビゲーション",
+    icon: PanelRight,
+    description: "編集画面のバージョン履歴のような補助情報を、作業領域の右側に開きます。",
+    guidance: [
+      "編集エリアと横に並べ、開いている間も作業を続けられるようにします。",
+      "開閉ボタンの aria-controls とパネルの id を揃え、aria-expanded に状態を渡します。",
+      "閉じるボタンやパネル内の Escape キーから閉じた場合は、開閉ボタンにフォーカスを戻します。",
+    ],
+    variants: ["右側に表示", "閉じる", "Escape で閉じる"],
+    file: "Drawer.tsx",
+    code: `import { useId, useRef, useState } from "react";
+import { AppButton } from "./ui/AppButton";
+import { Drawer } from "./ui/Drawer";
+
+const id = useId();
+const trigger = useRef<HTMLButtonElement>(null);
+const [open, setOpen] = useState(false);
+
+<AppButton ref={trigger} aria-expanded={open} aria-controls={id}
+  onClick={() => setOpen(!open)}>
+  {open ? "履歴を閉じる" : "履歴を開く"}
+</AppButton>
+<div className="flex">
+  <main className="min-w-0 flex-1"><Editor /></main>
+  <Drawer id={id} title="バージョン履歴" open={open} onClose={() => {
+    setOpen(false);
+    trigger.current?.focus();
+  }}>
+    <VersionHistory />
+  </Drawer>
+</div>`,
   },
   {
     id: "breadcrumb",

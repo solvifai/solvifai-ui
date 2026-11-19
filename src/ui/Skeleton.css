@@ -1,0 +1,15 @@
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton-track-fill {
+    animation: skeleton-track-slide 1.5s ease-in-out infinite;
+  }
+}
+
+@keyframes skeleton-track-slide {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(250%);
+  }
+}

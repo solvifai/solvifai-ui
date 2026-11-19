@@ -1,7 +1,8 @@
 import { ArrowDown, ArrowLeft, ArrowUp, FileText, Plus } from "lucide-react";
-import { useId, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
 import { Accordion } from "../ui/Accordion";
+import { AlertBanner } from "../ui/AlertBanner";
 import { AppButton } from "../ui/AppButton";
 import { AvatarGroup, type AvatarGroupMember } from "../ui/AvatarGroup";
 import { Badge } from "../ui/Badge";
@@ -16,12 +17,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/Dialog";
+import { Drawer } from "../ui/Drawer";
 import { SimpleEmptyState } from "../ui/EmptyState";
 import { FileChipList, type SelectedFile } from "../ui/FileChipList";
 import { FileUpload } from "../ui/FileUpload";
 import { FileTypeIcon } from "../ui/FileTypeIcon";
 import { FormField } from "../ui/FormField";
-import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon, TrashIcon } from "../ui/icons";
+import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon, SidebarIcon, TrashIcon } from "../ui/icons";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { OptionGroup, type OptionGroupOption } from "../ui/OptionGroup";
 import { ProgressBar } from "../ui/ProgressBar";
@@ -36,6 +38,7 @@ import { Table } from "../ui/Table";
 import { Tabs, type TabItem } from "../ui/Tabs";
 import { TablePagination } from "../ui/TablePagination";
 import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
+import { Skeleton } from "../ui/Skeleton";
 import { TextArea } from "../ui/TextArea";
 import { TextInput } from "../ui/TextInput";
 import { AppToaster, toast } from "../ui/Toast";
@@ -987,6 +990,122 @@ function ResizePanelPreview() {
   );
 }
 
+function AlertBannerPreview() {
+  const [state, setState] = useState<"error" | "retrying" | "fetched">("error");
+
+  useEffect(() => {
+    if (state !== "retrying") return;
+    const timer = window.setTimeout(() => setState("fetched"), 650);
+    return () => window.clearTimeout(timer);
+  }, [state]);
+
+  return (
+    <div className="grid w-full max-w-lg gap-3">
+      {state === "fetched" ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+          <p role="status">最新情報を取得しました。</p>
+          <AppButton variant="back" onClick={() => setState("error")}>
+            エラーを再表示
+          </AppButton>
+        </div>
+      ) : (
+        <AlertBanner
+          action={
+            <AppButton
+              className="!px-5"
+              disabled={state === "retrying"}
+              onClick={() => setState("retrying")}
+            >
+              {state === "retrying" ? "再取得中…" : "再取得"}
+            </AppButton>
+          }
+        >
+          最新情報を取得できませんでした。入力内容は保持しています。再取得してから保存してください。
+        </AlertBanner>
+      )}
+      <AlertBanner tone="warning">AIテキストの出力範囲は編集できません。</AlertBanner>
+    </div>
+  );
+}
+
+function SkeletonPreview() {
+  const [drafting, setDrafting] = useState(true);
+
+  return (
+    <div className="grid w-full max-w-md justify-items-start gap-3">
+      <div className="grid min-h-40 w-full content-center rounded-lg border border-catalog-line bg-white">
+        {drafting ? (
+          <Skeleton label="修正案作成中…" />
+        ) : (
+          <div className="grid gap-2 p-4 text-sm">
+            <p role="status" className="font-semibold text-catalog-ink">
+              修正案を作成しました
+            </p>
+            <p className="text-catalog-muted">
+              次月は問い合わせ対応時間を短縮するため、よくある質問を整理します。
+            </p>
+          </div>
+        )}
+      </div>
+      <AppButton variant="back" onClick={() => setDrafting(!drafting)}>
+        {drafting ? "作成結果を表示" : "作成中を表示"}
+      </AppButton>
+    </div>
+  );
+}
+
+function DrawerPreview() {
+  const id = useId();
+  const trigger = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="grid w-full max-w-xl justify-items-start gap-3">
+      <AppButton
+        ref={trigger}
+        variant="back"
+        iconLeft={<SidebarIcon />}
+        aria-controls={id}
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+      >
+        {open ? "履歴を閉じる" : "履歴を開く"}
+      </AppButton>
+      <div className="flex min-h-48 w-full gap-2 rounded-lg border border-catalog-line bg-product-bg p-2">
+        <section className="min-w-0 flex-1 rounded-lg border border-catalog-line bg-white p-2.5">
+          <p className="mb-4 text-xs font-semibold">編集エリア</p>
+          <p className="text-sm font-medium">月次レポート</p>
+          <p className="mt-2 text-xs text-catalog-muted">今月の進捗と次月の予定</p>
+        </section>
+        <Drawer
+          id={id}
+          title="バージョン履歴"
+          open={open}
+          onClose={() => {
+            setOpen(false);
+            trigger.current?.focus();
+          }}
+        >
+          <ul className="grid gap-2 p-2 text-xs">
+            <li className="grid gap-1 rounded-lg border border-blue-200 bg-blue-50 p-2">
+              <strong className="text-catalog-ink">v2 · 最新版</strong>
+              <time className="text-catalog-muted" dateTime="2026-11-19T10:30">
+                11月19日 10:30
+              </time>
+            </li>
+            <li className="grid gap-1 rounded-lg border border-gray-200 p-2">
+              <strong className="text-catalog-ink">v1</strong>
+              <time className="text-catalog-muted" dateTime="2026-11-18T16:45">
+                11月18日 16:45
+              </time>
+            </li>
+          </ul>
+        </Drawer>
+      </div>
+    </div>
+  );
+}
+
 export const previews = {
   "app-button": ButtonPreview,
   "text-input": TextPreview,
@@ -1016,6 +1135,9 @@ export const previews = {
   "text-area": TextAreaPreview,
   "date-picker": DatePickerPreview,
   "resizable-panel": ResizePanelPreview,
+  "alert-banner": AlertBannerPreview,
+  skeleton: SkeletonPreview,
+  drawer: DrawerPreview,
   breadcrumb: BreadcrumbPreview,
 };
 
@@ -1247,6 +1369,31 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
         <SimpleBreadcrumb
           items={[{ label: "ワークスペース", href: "#components" }, { label: "資料一覧" }]}
         />
+      );
+    case "alert-banner":
+      return (
+        <AlertBanner className="px-3 py-2 text-xs">最新情報を取得できませんでした。</AlertBanner>
+      );
+    case "skeleton":
+      return (
+        <Skeleton label="修正案作成中…" className="min-h-0 gap-1.5 p-0 [&_svg]:h-7 [&_svg]:w-8" />
+      );
+    case "drawer":
+      return (
+        <div className="flex w-full max-w-60 gap-1.5 rounded-lg border border-catalog-line bg-product-bg p-1.5">
+          <span className="grid min-w-0 flex-1 place-items-center rounded border border-catalog-line bg-white text-xs">
+            編集エリア
+          </span>
+          <Drawer
+            id="drawer-card-panel"
+            title="バージョン履歴"
+            open
+            onClose={() => {}}
+            className="w-[60%] [&_button]:size-7"
+          >
+            <p className="p-2 text-xs text-catalog-muted">v2 · 最新版</p>
+          </Drawer>
+        </div>
       );
   }
 }
