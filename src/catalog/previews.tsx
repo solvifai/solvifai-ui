@@ -17,16 +17,19 @@ import {
 } from "../ui/Dialog";
 import { SimpleEmptyState } from "../ui/EmptyState";
 import { FileChipList, type SelectedFile } from "../ui/FileChipList";
+import { FileUpload } from "../ui/FileUpload";
 import { FileTypeIcon } from "../ui/FileTypeIcon";
 import { FormField } from "../ui/FormField";
 import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon, TrashIcon } from "../ui/icons";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { OptionGroup, type OptionGroupOption } from "../ui/OptionGroup";
+import { ProgressBar } from "../ui/ProgressBar";
 import { Radio } from "../ui/Radio";
 import { RowActionMenu } from "../ui/RowActionMenu";
 import { SaveStatusIndicator, type SaveStatus } from "../ui/SaveStatusIndicator";
 import { SearchInput } from "../ui/SearchInput";
 import { SelectBox, type SelectBoxOption } from "../ui/SelectBox";
+import { Step, SteppedForm } from "../ui/SteppedForm";
 import { Table } from "../ui/Table";
 import { Tabs, type TabItem } from "../ui/Tabs";
 import { TablePagination } from "../ui/TablePagination";
@@ -723,6 +726,100 @@ function AccordionPreview() {
   );
 }
 
+function FileUploadPreview() {
+  const [files, setFiles] = useState<SelectedFile[]>([]);
+  return (
+    <div className="grid w-full max-w-md gap-3">
+      <FileUpload
+        accept=".pptx"
+        hint="PPTXファイルのみ対応"
+        onFiles={(selected) =>
+          setFiles(
+            selected.map((file) => ({ id: file.name, name: file.name, file, source: "local" })),
+          )
+        }
+      />
+      <FileChipList
+        files={files}
+        onRemove={(id) => setFiles((previous) => previous.filter((file) => file.id !== id))}
+      />
+      <p className="text-xs text-text-muted">
+        選んだファイルはこのプレビュー内だけで表示されます。
+      </p>
+    </div>
+  );
+}
+
+function ProgressBarPreview() {
+  const [progress, setProgress] = useState(35);
+  const id = useId();
+
+  return (
+    <div className="grid w-full max-w-md gap-3">
+      <ProgressBar label={progress === 100 ? "生成完了" : "スライド生成中"} progress={progress} />
+      <label htmlFor={id} className="text-xs font-medium text-text-muted">
+        サンプルの進捗を変更
+      </label>
+      <input
+        id={id}
+        type="range"
+        min={0}
+        max={100}
+        value={progress}
+        onChange={(event) => setProgress(event.currentTarget.valueAsNumber)}
+        className="w-full accent-blue-600"
+      />
+    </div>
+  );
+}
+
+const stepFormats = [
+  { value: "report", label: "月次レポート" },
+  { value: "proposal", label: "提案書" },
+];
+
+function SteppedFormPreview() {
+  const [name, setName] = useState("");
+  const [format, setFormat] = useState("");
+  const [outline, setOutline] = useState(false);
+  const id = useId();
+
+  return (
+    <SteppedForm className="w-full max-w-md">
+      <Step title="基本情報" complete={name.trim().length > 0}>
+        <FormField label="成果物資料名" htmlFor={id + "-name"}>
+          <TextInput
+            id={id + "-name"}
+            value={name}
+            onChange={setName}
+            placeholder="例：顧客向け提案資料"
+          />
+        </FormField>
+      </Step>
+      <Step title="フォーマット" complete={format !== ""}>
+        <FormField label="フォーマットを選ぶ" htmlFor={id + "-format"}>
+          <SelectBox
+            id={id + "-format"}
+            value={format}
+            options={stepFormats}
+            onChange={setFormat}
+          />
+        </FormField>
+      </Step>
+      <Step title="ドラフト目次" complete={outline}>
+        <div className="flex items-center gap-2 text-sm">
+          <Checkbox
+            checked={outline}
+            onChange={() => setOutline(!outline)}
+            ariaLabel="目次を確認しました"
+          />
+          <span>目次を確認しました</span>
+        </div>
+      </Step>
+    </SteppedForm>
+  );
+}
+
 export const previews = {
   "app-button": ButtonPreview,
   "text-input": TextPreview,
@@ -746,6 +843,9 @@ export const previews = {
   radio: RadioPreview,
   toggle: TogglePreview,
   accordion: AccordionPreview,
+  "file-upload": FileUploadPreview,
+  "progress-bar": ProgressBarPreview,
+  "stepped-form": SteppedFormPreview,
   breadcrumb: BreadcrumbPreview,
 };
 
@@ -926,6 +1026,24 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
           <Accordion heading="構成を確認する" />
           <Accordion heading="表記を整える" />
         </div>
+      );
+    case "file-upload":
+      return (
+        <FileUpload
+          accept=".pptx"
+          hint="PPTXファイルのみ対応"
+          onFiles={() => {}}
+          className="w-full [&_button]:min-h-0 [&_button]:gap-1 [&_button]:p-2 [&_button]:text-xs [&_svg]:size-5"
+        />
+      );
+    case "progress-bar":
+      return <ProgressBar label="スライド生成中" progress={45} className="w-full max-w-60" />;
+    case "stepped-form":
+      return (
+        <SteppedForm className="w-full max-w-60 [&_li>button]:min-h-8 [&_li>div]:hidden">
+          <Step title="基本情報" complete />
+          <Step title="フォーマット" complete={false} />
+        </SteppedForm>
       );
     case "breadcrumb":
       return (

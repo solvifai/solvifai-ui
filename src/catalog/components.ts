@@ -11,6 +11,8 @@ import {
   EllipsisVertical,
   FileSearch,
   Info,
+  Gauge,
+  ListOrdered,
   ListChecks,
   LoaderCircle,
   MousePointer2,
@@ -22,6 +24,7 @@ import {
   ToggleRight,
   Table2,
   Users,
+  Upload,
   type LucideIcon,
 } from "lucide-react";
 
@@ -574,6 +577,75 @@ import { EyeIcon } from "./ui/icons";
 <Accordion heading="表記を整える">
   固有名詞や表記の揺れを確認します。
 </Accordion>`,
+  },
+  {
+    id: "file-upload",
+    name: "FileUpload",
+    label: "ファイルアップロード",
+    category: "入力",
+    icon: Upload,
+    description: "クリックやドラッグ＆ドロップでファイルを選びます。",
+    guidance: [
+      "フォーマット作成のPPTXアップロード欄と同様に、指定できる形式を選択前に示します。",
+      "accept に対応する拡張子またはMIMEタイプを指定します。ドロップしたファイルにも同じ検証がかかります。",
+      "送信処理は onFiles の呼び出し元で行います。処理中は isUploading を指定します。",
+    ],
+    variants: ["選択", "ドラッグ＆ドロップ", "形式エラー"],
+    file: "FileUpload.tsx",
+    code: `import { FileUpload } from "./ui/FileUpload";
+
+<FileUpload
+  accept=".pptx"
+  hint="PPTXファイルのみ対応"
+  isUploading={isUploading}
+  onFiles={uploadFiles}
+/>`,
+  },
+  {
+    id: "progress-bar",
+    name: "ProgressBar",
+    label: "プログレスバー",
+    category: "状態表示",
+    icon: Gauge,
+    description: "スライド生成のように、処理がどこまで進んだかを割合と長さで示します。",
+    guidance: [
+      "label で何の処理かを示し、progress には0から100までの値を渡します。",
+      "処理結果を受け取ってから100%を表示し、ラベルも完了に切り替えます。",
+      "進捗の割合が分からない場合は読み込み表示を使います。",
+    ],
+    variants: ["開始前", "処理中", "完了"],
+    file: "ProgressBar.tsx",
+    code: `import { ProgressBar } from "./ui/ProgressBar";
+
+<ProgressBar
+  label={progress === 100 ? "生成完了" : "スライド生成中"}
+  progress={progress}
+/>`,
+  },
+  {
+    id: "stepped-form",
+    name: "SteppedForm",
+    label: "ステップ表示",
+    category: "ナビゲーション",
+    icon: ListOrdered,
+    description: "成果物作成フォームのように、入力を順番に進められるようにします。",
+    guidance: [
+      "入力内容のまとまりごとに Step を置き、短い見出しを付けます。",
+      "complete が true に変わると次の項目が開きます。完了の判定は画面側で入力内容に合わせます。",
+      "各ステップは見出しから開閉できます。閉じても入力内容は保持されます。",
+    ],
+    variants: ["未着手", "入力中", "完了", "次の項目を自動展開"],
+    file: "SteppedForm.tsx",
+    code: `import { Step, SteppedForm } from "./ui/SteppedForm";
+
+<SteppedForm>
+  <Step title="基本情報" complete={hasTitle}>
+    <TitleField />
+  </Step>
+  <Step title="フォーマット" complete={hasFormat}>
+    <FormatSelect />
+  </Step>
+</SteppedForm>`,
   },
   {
     id: "breadcrumb",
