@@ -775,11 +775,13 @@ import { AppButton } from "./ui/AppButton";
     file: "Skeleton.tsx",
     code: `import { Skeleton } from "./ui/Skeleton";
 
-{isDrafting ? (
-  <Skeleton label="修正案作成中…" />
-) : (
-  <DraftResult content={draft} />
-)}`,
+<>
+  {isDrafting ? (
+    <Skeleton label="修正案作成中…" />
+  ) : (
+    <DraftResult content={draft} />
+  )}
+</>`,
   },
   {
     id: "drawer",
@@ -803,19 +805,21 @@ const id = useId();
 const trigger = useRef<HTMLButtonElement>(null);
 const [open, setOpen] = useState(false);
 
-<AppButton ref={trigger} aria-expanded={open} aria-controls={id}
-  onClick={() => setOpen(!open)}>
-  {open ? "履歴を閉じる" : "履歴を開く"}
-</AppButton>
-<div className="flex">
-  <main className="min-w-0 flex-1"><Editor /></main>
-  <Drawer id={id} title="バージョン履歴" open={open} onClose={() => {
-    setOpen(false);
-    trigger.current?.focus();
-  }}>
-    <VersionHistory />
-  </Drawer>
-</div>`,
+<>
+  <AppButton ref={trigger} aria-expanded={open} aria-controls={id}
+    onClick={() => setOpen(!open)}>
+    {open ? "履歴を閉じる" : "履歴を開く"}
+  </AppButton>
+  <div className="flex">
+    <section className="min-w-0 flex-1"><Editor /></section>
+    <Drawer id={id} title="バージョン履歴" open={open} onClose={() => {
+      setOpen(false);
+      trigger.current?.focus();
+    }}>
+      <VersionHistory />
+    </Drawer>
+  </div>
+</>`,
   },
   {
     id: "breadcrumb",
