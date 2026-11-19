@@ -1,0 +1,32 @@
+@layer components {
+  .ui-table > :where(thead) {
+    background: var(--color-product-bg);
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+  }
+
+  .ui-table > :where(thead) > :where(tr) > :where(th, td) {
+    padding-block: 0.625rem;
+    text-align: inherit;
+  }
+
+  .ui-table > :where(tbody) > :where(tr) {
+    border-top: 1px solid var(--color-border-control);
+  }
+
+  .ui-table > :where(tbody) > :where(tr:hover) {
+    background: var(--color-product-bg);
+  }
+
+  .ui-table > :where(tbody) > :where(tr[data-selected="true"]) {
+    background: color-mix(in srgb, var(--color-brand-primary) 8%, white);
+  }
+
+  .ui-table > :where(thead, tbody) > :where(tr) > :where(th, td) {
+    padding-inline: var(--table-cell-padding-inline, 0.75rem);
+  }
+
+  .ui-table > :where(tbody) > :where(tr) > :where(th, td) {
+    padding-block: 0.75rem;
+  }
+}

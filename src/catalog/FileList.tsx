@@ -9,6 +9,7 @@ import { FileTypeIcon } from "../ui/FileTypeIcon";
 import { CopyIcon, TrashIcon } from "../ui/icons";
 import { RowActionMenu } from "../ui/RowActionMenu";
 import { SearchInput } from "../ui/SearchInput";
+import { Table } from "../ui/Table";
 import { TablePagination } from "../ui/TablePagination";
 
 const sampleFiles = [
@@ -140,10 +141,13 @@ export function FileList() {
           ) : null}
         </div>
         <div className="border-y border-catalog-line">
-          <table className="w-full table-fixed text-left text-sm" aria-label="サンプルファイル">
-            <thead className="bg-product-bg text-xs font-semibold text-catalog-muted">
+          <Table
+            className="table-fixed [--table-cell-padding-inline:0px]"
+            aria-label="サンプルファイル"
+          >
+            <thead>
               <tr>
-                <th scope="col" className="w-12 py-2.5 pl-4 sm:w-14 sm:pl-5">
+                <th scope="col" className="w-12 pl-4 sm:w-14 sm:pl-5">
                   <Checkbox
                     checked={allOnPage}
                     indeterminate={selectedOnPage > 0 && !allOnPage}
@@ -152,16 +156,14 @@ export function FileList() {
                     onChange={togglePage}
                   />
                 </th>
-                <th scope="col" className="py-2.5">
-                  ファイル名
-                </th>
-                <th scope="col" className="hidden w-30 py-2.5 sm:table-cell">
+                <th scope="col">ファイル名</th>
+                <th scope="col" className="hidden w-30 sm:table-cell">
                   更新日
                 </th>
-                <th scope="col" className="hidden w-22 py-2.5 sm:table-cell">
+                <th scope="col" className="hidden w-22 sm:table-cell">
                   容量
                 </th>
-                <th scope="col" className="w-13 py-2.5 sm:w-16">
+                <th scope="col" className="w-13 sm:w-16">
                   <span className="sr-only">操作</span>
                 </th>
               </tr>
@@ -170,18 +172,15 @@ export function FileList() {
               {visible.map((file) => {
                 const selected = selectedIds.has(file.id);
                 return (
-                  <tr
-                    key={file.id}
-                    className={`border-t border-catalog-line ${selected ? "bg-blue-50" : "hover:bg-slate-50/70"}`}
-                  >
-                    <td className="py-3 pl-4 sm:pl-5">
+                  <tr key={file.id} data-selected={selected || undefined}>
+                    <td className="pl-4 sm:pl-5">
                       <Checkbox
                         checked={selected}
                         ariaLabel={`${file.name}を選択`}
                         onChange={() => toggleRow(file.id)}
                       />
                     </td>
-                    <th scope="row" className="py-3 pr-2.5">
+                    <th scope="row" className="pr-2.5">
                       <div className="flex min-w-0 items-center gap-2.5">
                         <span aria-hidden="true" className="shrink-0">
                           <FileTypeIcon fileName={file.name} nativeTooltip={false} />
@@ -199,11 +198,11 @@ export function FileList() {
                         </div>
                       </div>
                     </th>
-                    <td className="hidden py-3 text-catalog-muted sm:table-cell">
+                    <td className="hidden text-catalog-muted sm:table-cell">
                       <time dateTime={file.date}>{file.date.replaceAll("-", "/")}</time>
                     </td>
-                    <td className="hidden py-3 text-catalog-muted sm:table-cell">{file.size}</td>
-                    <td className="py-3">
+                    <td className="hidden text-catalog-muted sm:table-cell">{file.size}</td>
+                    <td>
                       <RowActionMenu
                         title={file.name}
                         actions={[
@@ -241,7 +240,7 @@ export function FileList() {
                 </tr>
               ) : null}
             </tbody>
-          </table>
+          </Table>
         </div>
         <TablePagination
           page={page}
@@ -254,6 +253,9 @@ export function FileList() {
         {status}
       </p>
       <div className="flex flex-wrap gap-x-5">
+        <a className="source-link" href="#table">
+          テーブルの使い方
+        </a>
         <a className="source-link" href="#row-action-menu">
           三点メニューの使い方
         </a>

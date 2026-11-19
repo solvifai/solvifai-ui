@@ -1,7 +1,8 @@
-import { ArrowLeft, FileText, Plus } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, FileText, Plus } from "lucide-react";
 import { useId, useState } from "react";
 
 import { AppButton } from "../ui/AppButton";
+import { AvatarGroup, type AvatarGroupMember } from "../ui/AvatarGroup";
 import { Badge } from "../ui/Badge";
 import { Checkbox } from "../ui/Checkbox";
 import {
@@ -14,13 +15,17 @@ import {
   DialogTrigger,
 } from "../ui/Dialog";
 import { SimpleEmptyState } from "../ui/EmptyState";
+import { FileChipList, type SelectedFile } from "../ui/FileChipList";
 import { FileTypeIcon } from "../ui/FileTypeIcon";
 import { FormField } from "../ui/FormField";
 import { CopyIcon, TrashIcon } from "../ui/icons";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
+import { OptionGroup, type OptionGroupOption } from "../ui/OptionGroup";
 import { RowActionMenu } from "../ui/RowActionMenu";
+import { SaveStatusIndicator, type SaveStatus } from "../ui/SaveStatusIndicator";
 import { SearchInput } from "../ui/SearchInput";
 import { SelectBox, type SelectBoxOption } from "../ui/SelectBox";
+import { Table } from "../ui/Table";
 import { TablePagination } from "../ui/TablePagination";
 import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
 import { TextInput } from "../ui/TextInput";
@@ -350,6 +355,193 @@ function PaginationPreview() {
   );
 }
 
+const previewRows = [
+  { id: 1, name: "月次レポート", updated: "11/18", status: "完了" },
+  { id: 2, name: "提案書", updated: "11/15", status: "確認中" },
+  { id: 3, name: "定例会の議事録", updated: "11/12", status: "完了" },
+];
+
+function TablePreview() {
+  const [order, setOrder] = useState<"ascending" | "descending">("descending");
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [empty, setEmpty] = useState(false);
+  const rows = order === "descending" ? previewRows : [...previewRows].reverse();
+  const SortIcon = order === "descending" ? ArrowDown : ArrowUp;
+
+  return (
+    <div className="grid w-full max-w-lg gap-3">
+      <div className="overflow-x-auto rounded-lg border border-catalog-line bg-white">
+        <Table aria-label="資料一覧の例">
+          <thead>
+            <tr>
+              <th scope="col" className="w-9">
+                <span className="sr-only">行選択</span>
+              </th>
+              <th scope="col">資料名</th>
+              <th scope="col" aria-sort={order}>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1 rounded"
+                  onClick={() => setOrder(order === "descending" ? "ascending" : "descending")}
+                >
+                  更新日
+                  <SortIcon size={13} aria-hidden="true" />
+                </button>
+              </th>
+              <th scope="col">状態</th>
+            </tr>
+          </thead>
+          <tbody>
+            {empty ? (
+              <tr>
+                <td colSpan={4}>
+                  <SimpleEmptyState message="資料がありません" />
+                </td>
+              </tr>
+            ) : (
+              rows.map((row) => (
+                <tr key={row.id} data-selected={selectedId === row.id || undefined}>
+                  <td>
+                    <Checkbox
+                      checked={selectedId === row.id}
+                      onChange={() => setSelectedId(selectedId === row.id ? null : row.id)}
+                      ariaLabel={`${row.name}を選択`}
+                    />
+                  </td>
+                  <th scope="row" className="font-medium">
+                    {row.name}
+                  </th>
+                  <td>{row.updated}</td>
+                  <td>
+                    <Badge label={row.status} color={row.status === "完了" ? "green" : "blue"} />
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </Table>
+      </div>
+      <div>
+        <AppButton variant="back" onClick={() => setEmpty(!empty)}>
+          {empty ? "サンプル行を表示" : "0件を表示"}
+        </AppButton>
+      </div>
+    </div>
+  );
+}
+
+const attachmentFiles: readonly SelectedFile[] = [
+  { id: "a", name: "月次レポート.xlsx", source: "local" },
+  { id: "b", name: "共有用_下期事業計画と各チームの重要アクション一覧.docx", source: "document" },
+  { id: "c", name: "定例会の議事録", source: "minute" },
+];
+
+function FileChipListPreview() {
+  const [files, setFiles] = useState(attachmentFiles);
+
+  return (
+    <div className="grid w-full max-w-lg gap-3">
+      {files.length > 0 ? (
+        <FileChipList
+          files={files}
+          onRemove={(id) => setFiles((previous) => previous.filter((file) => file.id !== id))}
+        />
+      ) : (
+        <SimpleEmptyState message="添付ファイルがありません" />
+      )}
+      <div>
+        <AppButton
+          variant="back"
+          disabled={files.length === attachmentFiles.length}
+          onClick={() => setFiles(attachmentFiles)}
+        >
+          添付を元に戻す
+        </AppButton>
+      </div>
+    </div>
+  );
+}
+
+const demoMembers: readonly AvatarGroupMember[] = [
+  { id: 1, name: "SolvifAI サポート", icon_path: import.meta.env.BASE_URL + "favicon.png" },
+  { id: 2, name: "田中 花子" },
+  { id: 3, name: "佐藤 直樹" },
+  { id: 4, name: "伊藤 彩" },
+  { id: 5, name: "鈴木 亮" },
+];
+
+function AvatarGroupPreview() {
+  return (
+    <div className="flex flex-wrap justify-center gap-3">
+      <div className="grid min-w-32 gap-2 rounded-lg border border-catalog-line bg-white p-3 text-xs">
+        <span>画像あり・画像なし</span>
+        <AvatarGroup members={demoMembers.slice(0, 2)} />
+      </div>
+      <div className="grid min-w-32 gap-2 rounded-lg border border-catalog-line bg-white p-3 text-xs">
+        <span>3人に制限</span>
+        <AvatarGroup members={demoMembers} maxVisible={3} />
+      </div>
+      <div className="grid min-w-32 gap-2 rounded-lg border border-catalog-line bg-white p-3 text-xs">
+        <span>自分を含めて表示</span>
+        <AvatarGroup members={demoMembers} maxVisible={3} currentUserId={5} />
+      </div>
+    </div>
+  );
+}
+
+const saveStates: readonly { value: SaveStatus; label: string }[] = [
+  { value: "idle", label: "待機中" },
+  { value: "saving", label: "保存中" },
+  { value: "saved", label: "保存済み" },
+  { value: "error", label: "失敗" },
+];
+
+function SaveStatusPreview() {
+  const [status, setStatus] = useState<SaveStatus>("saved");
+  return (
+    <div className="grid w-full max-w-sm gap-3">
+      <div className="flex min-h-14 flex-wrap items-center justify-between gap-2 rounded-lg border border-catalog-line bg-white px-3 py-2">
+        <SaveStatusIndicator status={status} />
+        {status === "error" ? (
+          <AppButton variant="back" className="h-8" onClick={() => setStatus("saved")}>
+            再試行
+          </AppButton>
+        ) : null}
+      </div>
+      <div role="group" aria-label="保存状態を切り替える" className="flex flex-wrap gap-2">
+        {saveStates.map(({ value, label }) => (
+          <button
+            type="button"
+            key={value}
+            aria-pressed={status === value}
+            className="rounded-md border border-catalog-line bg-white px-2.5 py-1.5 text-xs hover:border-brand-primary aria-pressed:border-brand-primary aria-pressed:text-brand-foreground"
+            onClick={() => setStatus(value)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const demoOptions: readonly OptionGroupOption[] = [
+  { value: "private", label: "個人のみ", description: "自分だけが閲覧できます" },
+  { value: "team", label: "チーム", description: "メンバーが閲覧できます" },
+  { value: "all", label: "全体公開", disabled: true },
+  { value: "limited", label: "一部のメンバー", count: 3 },
+];
+
+function OptionGroupPreview() {
+  const [value, setValue] = useState("");
+  return (
+    <div className="w-full max-w-md">
+      <p className="mb-2 text-sm font-medium text-text-muted">共有範囲</p>
+      <OptionGroup options={demoOptions} value={value} onChange={setValue} ariaLabel="共有範囲" />
+    </div>
+  );
+}
+
 export const previews = {
   "app-button": ButtonPreview,
   "text-input": TextPreview,
@@ -362,6 +554,11 @@ export const previews = {
   "empty-state": EmptyPreview,
   "row-action-menu": RowActionMenuPreview,
   "table-pagination": PaginationPreview,
+  table: TablePreview,
+  "file-chip-list": FileChipListPreview,
+  "avatar-group": AvatarGroupPreview,
+  "save-status-indicator": SaveStatusPreview,
+  "option-group": OptionGroupPreview,
   breadcrumb: BreadcrumbPreview,
 };
 
@@ -453,6 +650,47 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
         <div className="w-full rounded-lg border border-catalog-line bg-white">
           <TablePagination page={1} perPage={5} total={13} onPageChange={() => {}} />
         </div>
+      );
+    case "table":
+      return (
+        <div className="w-full overflow-hidden rounded-lg border border-catalog-line bg-white">
+          <Table className="text-xs" aria-label="テーブルの例">
+            <thead>
+              <tr>
+                <th scope="col">資料名</th>
+                <th scope="col">更新日</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-selected="true">
+                <th scope="row" className="font-medium">
+                  月次レポート
+                </th>
+                <td>11/18</td>
+              </tr>
+            </tbody>
+          </Table>
+        </div>
+      );
+    case "file-chip-list":
+      return <FileChipList files={attachmentFiles.slice(0, 1)} onRemove={() => {}} />;
+    case "avatar-group":
+      return <AvatarGroup members={demoMembers} maxVisible={3} />;
+    case "save-status-indicator":
+      return (
+        <SaveStatusIndicator
+          status="saved"
+          className="rounded-lg border border-catalog-line bg-white px-3 py-2"
+        />
+      );
+    case "option-group":
+      return (
+        <OptionGroup
+          options={demoOptions.slice(0, 2)}
+          value="team"
+          ariaLabel="共有範囲"
+          className="gap-1.5"
+        />
       );
     case "breadcrumb":
       return (

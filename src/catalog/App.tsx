@@ -34,6 +34,7 @@ const categoryLinks = {
   操作: "#category-actions",
   入力: "#category-inputs",
   状態表示: "#category-feedback",
+  データ表示: "#category-data",
   ナビゲーション: "#category-navigation",
 } satisfies Record<Category, string>;
 
@@ -264,6 +265,14 @@ function Detail({ entry }: { entry: ComponentEntry }) {
           <ArrowUpRight size={15} />
         </a>
       </section>
+      {entry.id === "table" ? (
+        <div>
+          <a className="source-link" href="#file-list">
+            ファイル一覧サンプルで試す
+            <ArrowUpRight size={15} aria-hidden="true" />
+          </a>
+        </div>
+      ) : null}
       <a className="back-link" href="#components">
         <ArrowLeft size={16} />
         コンポーネント一覧へ

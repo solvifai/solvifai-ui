@@ -1,20 +1,32 @@
 import {
   AlignLeft,
   CheckSquare,
+  CloudUpload,
   ChevronRight,
   ChevronsUpDown,
   EllipsisVertical,
   FileSearch,
+  ListChecks,
   LoaderCircle,
   MousePointer2,
   PanelTop,
+  Paperclip,
   StepForward,
   Search,
   Tag,
+  Table2,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
-export const categories = ["すべて", "操作", "入力", "状態表示", "ナビゲーション"] as const;
+export const categories = [
+  "すべて",
+  "操作",
+  "入力",
+  "状態表示",
+  "データ表示",
+  "ナビゲーション",
+] as const;
 export type Category = (typeof categories)[number];
 
 type Entry = {
@@ -299,6 +311,126 @@ import { CopyIcon, TrashIcon } from "./ui/icons";
   perPage={5}
   total={filteredFiles.length}
   onPageChange={setPage}
+/>`,
+  },
+  {
+    id: "table",
+    name: "Table",
+    label: "テーブル",
+    category: "データ表示",
+    icon: Table2,
+    description: "列見出しと行を揃えて、複数の項目を比較できる形で表示します。",
+    guidance: [
+      "列見出しには th と scope='col' を使い、行を識別するセルには scope='row' を使います。",
+      "並び替えできる列は、見出しのボタンと aria-sort で現在の順序を伝えます。",
+      "選択中の行に data-selected='true' を付けると背景が変わります。0件のときは一覧内に空の状態を表示します。",
+    ],
+    variants: ["基本", "並び替え", "行選択", "0件"],
+    file: "Table.tsx",
+    code: `import { Table } from "./ui/Table";
+
+<Table aria-label="資料一覧">
+  <thead>
+    <tr><th scope="col">ファイル名</th><th scope="col">更新日</th></tr>
+  </thead>
+  <tbody>
+    {files.map((file) => (
+      <tr key={file.id} data-selected={selectedIds.has(file.id) || undefined}>
+        <th scope="row">{file.name}</th>
+        <td>{file.updatedAt}</td>
+      </tr>
+    ))}
+  </tbody>
+</Table>`,
+  },
+  {
+    id: "file-chip-list",
+    name: "FileChipList",
+    label: "添付ファイルチップ",
+    category: "入力",
+    icon: Paperclip,
+    description: "添付済みのファイル名と形式を表示し、個別に取り外せます。",
+    guidance: [
+      "複数ファイルの添付後に使います。ファイルごとに一意の id を指定します。",
+      "ファイル名や拡張子からアイコンを表示します。議事録は source に minute を指定します。",
+      "onRemove で親の添付ファイル一覧から指定された id を取り除きます。",
+    ],
+    variants: ["複数添付", "長い名前", "取り外し", "添付なし"],
+    file: "FileChipList.tsx",
+    code: `import { FileChipList } from "./ui/FileChipList";
+
+<FileChipList
+  files={files}
+  onRemove={(id) => setFiles((previous) => previous.filter((file) => file.id !== id))}
+/>`,
+  },
+  {
+    id: "avatar-group",
+    name: "AvatarGroup",
+    label: "アバターグループ",
+    category: "データ表示",
+    icon: Users,
+    description: "メンバーのアバターを重ね、表示枠に収まらない人数を +N で示します。",
+    guidance: [
+      "一覧では maxVisible で表示人数を揃えます。画像がない場合は共通のユーザーアイコンを表示します。",
+      "自分も表示枠に入れたい場合は currentUserId を指定します。",
+      "隠れたメンバー名は +N にカーソルを合わせると確認できます。",
+    ],
+    variants: ["画像あり", "画像なし", "人数超過"],
+    file: "AvatarGroup.tsx",
+    code: `import { AvatarGroup } from "./ui/AvatarGroup";
+
+<AvatarGroup
+  members={[{ id: 1, name: "田中 花子", icon_path: avatarUrl }, ...otherMembers]}
+  maxVisible={3}
+  currentUserId={1}
+/>`,
+  },
+  {
+    id: "save-status-indicator",
+    name: "SaveStatusIndicator",
+    label: "保存状態",
+    category: "状態表示",
+    icon: CloudUpload,
+    description: "自動保存の待機・進行・成功・失敗を、編集画面内に表示します。",
+    guidance: [
+      "編集中も目に入る位置に置き、実際の保存処理に合わせて status を更新します。",
+      "失敗時に再試行できる場合は、状態表示の近くに再試行ボタンを置きます。",
+    ],
+    variants: ["待機中", "保存中", "保存済み", "失敗"],
+    file: "SaveStatusIndicator.tsx",
+    code: `import { AppButton } from "./ui/AppButton";
+import { SaveStatusIndicator } from "./ui/SaveStatusIndicator";
+
+<>
+  <SaveStatusIndicator status={saveStatus} />
+  {saveStatus === "error" ? <AppButton onClick={retrySave}>再試行</AppButton> : null}
+</>`,
+  },
+  {
+    id: "option-group",
+    name: "OptionGroup",
+    label: "選択肢グループ",
+    category: "入力",
+    icon: ListChecks,
+    description: "少数の選択肢を並べ、説明を読みながら1つ選べるようにします。",
+    guidance: [
+      "選択肢の違いを常に見せておきたい場合に使います。グループには ariaLabel を指定します。",
+      "各選択肢は一意の value を持ちます。選択できない項目には disabled を指定します。",
+      "説明や件数を添えて、選んだときに何が変わるかを伝えます。",
+    ],
+    variants: ["未選択", "選択済み", "説明付き", "無効"],
+    file: "OptionGroup.tsx",
+    code: `import { OptionGroup } from "./ui/OptionGroup";
+
+<OptionGroup
+  ariaLabel="共有範囲"
+  value={visibility}
+  onChange={setVisibility}
+  options={[
+    { value: "private", label: "個人のみ", description: "自分だけが閲覧できます" },
+    { value: "team", label: "チーム", description: "メンバーが閲覧できます" },
+  ]}
 />`,
   },
   {
