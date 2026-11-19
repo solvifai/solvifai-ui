@@ -3,6 +3,7 @@ import {
   AppWindow,
   Bell,
   CheckSquare,
+  CalendarClock,
   CalendarDays,
   CloudUpload,
   CircleDot,
@@ -701,6 +702,29 @@ import { TextArea } from "./ui/TextArea";
   min={startDate || undefined}
   value={endDate}
   onChange={(event) => setEndDate(event.currentTarget.value)}
+/>`,
+  },
+  {
+    id: "date-time-picker",
+    name: "DateTimePicker",
+    label: "日時ピッカー",
+    category: "入力",
+    icon: CalendarClock,
+    description: "ログ管理のように、日付と時刻を分単位で指定します。",
+    guidance: [
+      "期間を指定するときは「開始日時」と「終了日時」のラベルを付けます。",
+      "分単位の値は YYYY-MM-DDTHH:mm 形式です。min と max も同じ形式で渡します。",
+      "値にタイムゾーンは含まれません。ログ管理のように日本時間で扱う場合は、入力の近くに明記し、送信時に変換します。",
+    ],
+    variants: ["日時入力", "開始日時と終了日時", "範囲エラー"],
+    file: "DatePicker.tsx",
+    code: `import { DateTimePicker } from "./ui/DatePicker";
+
+<DateTimePicker
+  aria-label="終了日時（日本時間）"
+  min={startAt || undefined}
+  value={endAt}
+  onChange={(event) => setEndAt(event.currentTarget.value)}
 />`,
   },
   {

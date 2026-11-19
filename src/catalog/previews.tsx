@@ -7,7 +7,7 @@ import { AppButton } from "../ui/AppButton";
 import { AvatarGroup, type AvatarGroupMember } from "../ui/AvatarGroup";
 import { Badge } from "../ui/Badge";
 import { Checkbox } from "../ui/Checkbox";
-import { DatePicker } from "../ui/DatePicker";
+import { DatePicker, DateTimePicker } from "../ui/DatePicker";
 import {
   Dialog,
   DialogClose,
@@ -909,6 +909,58 @@ function DatePickerPreview() {
   );
 }
 
+function DateTimePickerPreview() {
+  const id = useId();
+  const zoneId = id + "-zone";
+  const errorId = id + "-error";
+  const [start, setStart] = useState({
+    value: "2026-11-19T09:00",
+    valueAsNumber: Date.UTC(2026, 10, 19, 9),
+  });
+  const [end, setEnd] = useState({
+    value: "2026-11-19T18:00",
+    valueAsNumber: Date.UTC(2026, 10, 19, 18),
+  });
+  const invalid = end.valueAsNumber < start.valueAsNumber;
+
+  return (
+    <div className="grid w-full max-w-lg gap-3">
+      <p id={zoneId} className="text-xs text-catalog-muted">
+        日本時間（JST）
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <FormField label="開始日時" htmlFor={id + "-start"}>
+          <DateTimePicker
+            id={id + "-start"}
+            value={start.value}
+            aria-describedby={zoneId}
+            onChange={({ currentTarget: { value, valueAsNumber } }) =>
+              setStart({ value, valueAsNumber })
+            }
+          />
+        </FormField>
+        <FormField label="終了日時" htmlFor={id + "-end"}>
+          <DateTimePicker
+            id={id + "-end"}
+            min={start.value || undefined}
+            value={end.value}
+            aria-invalid={invalid || undefined}
+            aria-describedby={invalid ? zoneId + " " + errorId : zoneId}
+            onChange={({ currentTarget: { value, valueAsNumber } }) =>
+              setEnd({ value, valueAsNumber })
+            }
+          />
+          {invalid ? (
+            <p id={errorId} className="demo-error">
+              終了日時は開始日時以降を選んでください。
+            </p>
+          ) : null}
+        </FormField>
+      </div>
+    </div>
+  );
+}
+
 function ResizePanelPreview() {
   const container = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(520);
@@ -1134,6 +1186,7 @@ export const previews = {
   "stepped-form": SteppedFormPreview,
   "text-area": TextAreaPreview,
   "date-picker": DatePickerPreview,
+  "date-time-picker": DateTimePickerPreview,
   "resizable-panel": ResizePanelPreview,
   "alert-banner": AlertBannerPreview,
   skeleton: SkeletonPreview,
@@ -1349,6 +1402,14 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
       );
     case "date-picker":
       return <DatePicker aria-label="開始日" defaultValue="2026-11-01" className="max-w-48" />;
+    case "date-time-picker":
+      return (
+        <DateTimePicker
+          aria-label="開始日時"
+          defaultValue="2026-11-19T09:00"
+          className="max-w-60"
+        />
+      );
     case "resizable-panel":
       return (
         <div className="flex h-16 w-full max-w-60 overflow-hidden rounded-lg border border-catalog-line bg-white text-xs">
