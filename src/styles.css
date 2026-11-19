@@ -337,7 +337,7 @@ button:not(:disabled) {
   gap: 7px;
   margin: 18px 0 15px;
 }
-.filters a {
+.filters :is(a, button) {
   padding: 6px 10px;
   border-radius: 7px;
   border: 1px solid var(--color-catalog-line);
@@ -345,10 +345,10 @@ button:not(:disabled) {
   font-size: 12px;
   font-weight: 650;
 }
-.filters a:hover {
+.filters :is(a, button):hover {
   border-color: #aacbf5;
 }
-.filters a[aria-current="true"] {
+.filters :is(a[aria-current="true"], button[aria-pressed="true"]) {
   background: #eaf3ff;
   border-color: #c8dffb;
   color: var(--color-catalog-blue);

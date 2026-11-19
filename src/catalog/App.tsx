@@ -402,8 +402,7 @@ export function App() {
   if (entry) content = <Detail key={entry.id} entry={entry} />;
   if (hash === "#tokens") content = <Tokens />;
   if (hash === "#guidelines") content = <Guidelines />;
-  if (hash === "#icons")
-    content = <Icons sourceHref={repository + "/blob/main/src/ui/icons.tsx"} />;
+  if (hash === "#icons") content = <Icons sourceBase={repository + "/blob/main/src/ui"} />;
 
   return (
     <>

@@ -19,7 +19,7 @@ npm run dev
 
 - `src/ui/` に既存のSolvifAI React UIをもとにしたコンポーネントとトークンを置きます。
 - `src/catalog/` にカタログの説明、利用例、動作例を置きます。
-- `src/ui/icons.tsx` と `public/` に、本体の共通アイコンとSolvifAIのブランド素材を置きます。
+- `src/ui/icons.tsx`、`src/ui/sidebar-icons.tsx`、`src/ui/{FolderIcon,PinIcon}.tsx` に本体のアイコンを、`public/` にブランド素材とフォルダの画像を置きます。
 - `src/catalog/guidelines.md` に人とAIで共有するUIルールを置きます。
 
 AppButton、TextInputとFormField、SearchInput、SelectBox、Checkbox、Badge、Dialog、LoadingSpinner、SimpleEmptyState、SimpleBreadcrumb を収録しています。動作例は `src/ui/` の実装を直接使います。サンプルデータは架空です。

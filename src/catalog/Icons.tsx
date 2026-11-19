@@ -1,15 +1,10 @@
 import { ArrowDownToLine, ArrowUpRight, Shapes } from "lucide-react";
 
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  DocumentIcon,
-  DownloadIcon,
-  PlusIcon,
-  SearchIcon,
-  TrashIcon,
-  UploadIcon,
-} from "../ui/icons";
+import { useState } from "react";
+
+import { SearchInput } from "../ui/SearchInput";
+import { SimpleEmptyState } from "../ui/EmptyState";
+import { iconGroups, icons } from "./iconGroups";
 
 export const brandSymbolUrl = import.meta.env.BASE_URL + "solvifai-symbol.svg";
 
@@ -29,18 +24,23 @@ const brandAssets = [
   },
 ];
 
-const productIcons = [
-  { label: "追加", name: "PlusIcon", Icon: PlusIcon },
-  { label: "検索", name: "SearchIcon", Icon: SearchIcon },
-  { label: "資料", name: "DocumentIcon", Icon: DocumentIcon },
-  { label: "選択済み", name: "CheckIcon", Icon: CheckIcon },
-  { label: "展開", name: "ChevronDownIcon", Icon: ChevronDownIcon },
-  { label: "アップロード", name: "UploadIcon", Icon: UploadIcon },
-  { label: "ダウンロード", name: "DownloadIcon", Icon: DownloadIcon },
-  { label: "削除", name: "TrashIcon", Icon: TrashIcon },
-];
+const filters = ["すべて", ...iconGroups.map(({ label }) => label)] as const;
 
-export function Icons({ sourceHref }: { sourceHref: string }) {
+export function Icons({ sourceBase }: { sourceBase: string }) {
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState<(typeof filters)[number]>("すべて");
+  const search = query.trim().toLowerCase();
+  const groups = iconGroups
+    .filter(({ label }) => filter === "すべて" || label === filter)
+    .map(({ label, entries }) => ({
+      label,
+      entries: entries.filter(([name, component]) =>
+        `${name} ${component} ${label}`.toLowerCase().includes(search),
+      ),
+    }))
+    .filter(({ entries }) => entries.length > 0);
+  const count = groups.reduce((total, { entries }) => total + entries.length, 0);
+
   return (
     <div className="document-page">
       <header className="document-heading">
@@ -78,25 +78,75 @@ export function Icons({ sourceHref }: { sourceHref: string }) {
           ))}
         </div>
       </section>
-      <section className="document-section">
-        <h2>共通UIアイコン</h2>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {productIcons.map(({ label, name, Icon }) => (
-            <div className="token" key={name}>
-              <div className="flex h-16 items-center justify-center bg-product-bg text-catalog-ink">
-                <Icon className="size-6" />
-              </div>
-              <div>
-                <strong>{label}</strong>
-                <code>{name}</code>
-              </div>
-            </div>
-          ))}
+      <section className="document-section" aria-labelledby="icon-list-title">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 id="icon-list-title" className="!mb-0">
+            共通UIアイコン
+          </h2>
+          <SearchInput
+            className="catalog-search"
+            value={query}
+            onChange={setQuery}
+            ariaLabel="アイコンを検索"
+            placeholder="名前・用途で検索"
+          />
         </div>
-        <a className="source-link" href={sourceHref}>
-          React実装をGitHubで見る
-          <ArrowUpRight size={15} aria-hidden="true" />
-        </a>
+        <div className="filters" role="group" aria-label="アイコンの分類">
+          {filters.map((label) => (
+            <button
+              key={label}
+              type="button"
+              aria-pressed={filter === label}
+              onClick={() => setFilter(label)}
+            >
+              {label}
+            </button>
+          ))}
+          <span className="result-count" role="status">
+            {count}件
+          </span>
+        </div>
+        {count === 0 ? (
+          <SimpleEmptyState
+            message="一致するアイコンがありません"
+            subMessage="別の名前や用途で検索してください。"
+          />
+        ) : (
+          groups.map(({ label, entries }) => (
+            <section className="mt-6" key={label}>
+              <h3 className="mb-3 text-sm font-semibold">{label}</h3>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                {entries.map(([name, component]) => {
+                  const Icon = icons[component];
+                  return (
+                    <article className="token" key={component}>
+                      <div
+                        className="flex h-16 items-center justify-center bg-product-bg text-catalog-ink"
+                        aria-hidden="true"
+                      >
+                        <Icon className="size-6" active />
+                      </div>
+                      <div>
+                        <strong>{name}</strong>
+                        <code>{component}</code>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          ))
+        )}
+        <div className="flex flex-wrap gap-x-5">
+          <a className="source-link" href={sourceBase + "/icons.tsx"}>
+            共通アイコンのReact実装
+            <ArrowUpRight size={15} aria-hidden="true" />
+          </a>
+          <a className="source-link" href={sourceBase + "/sidebar-icons.tsx"}>
+            サイドバーアイコンのReact実装
+            <ArrowUpRight size={15} aria-hidden="true" />
+          </a>
+        </div>
       </section>
     </div>
   );
