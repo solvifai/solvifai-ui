@@ -18,7 +18,7 @@ import { SimpleEmptyState } from "../ui/EmptyState";
 import { FileChipList, type SelectedFile } from "../ui/FileChipList";
 import { FileTypeIcon } from "../ui/FileTypeIcon";
 import { FormField } from "../ui/FormField";
-import { CopyIcon, TrashIcon } from "../ui/icons";
+import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon, TrashIcon } from "../ui/icons";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { OptionGroup, type OptionGroupOption } from "../ui/OptionGroup";
 import { RowActionMenu } from "../ui/RowActionMenu";
@@ -26,9 +26,12 @@ import { SaveStatusIndicator, type SaveStatus } from "../ui/SaveStatusIndicator"
 import { SearchInput } from "../ui/SearchInput";
 import { SelectBox, type SelectBoxOption } from "../ui/SelectBox";
 import { Table } from "../ui/Table";
+import { Tabs, type TabItem } from "../ui/Tabs";
 import { TablePagination } from "../ui/TablePagination";
 import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
 import { TextInput } from "../ui/TextInput";
+import { AppToaster, toast } from "../ui/Toast";
+import { Tooltip } from "../ui/Tooltip";
 
 function ButtonPreview() {
   const [status, setStatus] = useState("");
@@ -542,6 +545,116 @@ function OptionGroupPreview() {
   );
 }
 
+type DocumentTab = "individual" | "shared" | "archive";
+
+function TabFiles({ files }: { files: readonly string[] }) {
+  return (
+    <ul className="divide-y divide-catalog-line rounded-lg border border-catalog-line bg-white">
+      {files.map((name) => (
+        <li key={name} className="flex items-center gap-2 px-3 py-2 text-sm">
+          <FileTypeIcon fileName={name} className="size-5" nativeTooltip={false} />
+          <span className="min-w-0 truncate">{name}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+const documentTabs: readonly TabItem<DocumentTab>[] = [
+  {
+    value: "individual",
+    label: "PJ個別データ",
+    panel: <TabFiles files={["月次レポート.xlsx", "プロジェクト計画書.docx"]} />,
+  },
+  {
+    value: "shared",
+    label: "全体共通データ",
+    panel: <TabFiles files={["社内ガイドライン.pdf", "提案書テンプレート.pptx"]} />,
+  },
+  {
+    value: "archive",
+    label: "アーカイブ",
+    panel: null,
+    disabled: true,
+  },
+];
+
+function TabsPreview() {
+  const [tab, setTab] = useState<DocumentTab>("individual");
+
+  return (
+    <Tabs
+      className="w-full max-w-lg"
+      tabs={documentTabs}
+      value={tab}
+      onChange={setTab}
+      ariaLabel="資料の範囲"
+    />
+  );
+}
+
+const previewToastId = "catalog-toast";
+
+function ToastPreview() {
+  return (
+    <div className="demo-row">
+      <AppButton
+        variant="back"
+        onClick={() => toast.success("フォルダを作成しました", { id: previewToastId })}
+      >
+        成功の通知
+      </AppButton>
+      <AppButton
+        variant="back"
+        onClick={() => toast.warning("PPTXファイルを選択してください", { id: previewToastId })}
+      >
+        注意の通知
+      </AppButton>
+      <AppButton
+        variant="back"
+        onClick={() => toast.error("ファイルを移動できませんでした", { id: previewToastId })}
+      >
+        エラーの通知
+      </AppButton>
+      <AppToaster />
+    </div>
+  );
+}
+
+function TooltipPreview() {
+  const [highlighted, setHighlighted] = useState(false);
+  const buttonClass =
+    "inline-flex size-10 items-center justify-center rounded-lg border border-catalog-line bg-white hover:bg-slate-50 aria-pressed:text-brand-foreground";
+
+  return (
+    <div className="grid justify-items-center gap-3">
+      <div className="demo-row">
+        <Tooltip content={highlighted ? "作成理由ハイライトを非表示" : "作成理由ハイライトを表示"}>
+          <button
+            type="button"
+            aria-label="作成理由ハイライト"
+            aria-pressed={highlighted}
+            className={buttonClass}
+            onClick={() => setHighlighted(!highlighted)}
+          >
+            {highlighted ? <EyeIcon /> : <EyeOffIcon />}
+          </button>
+        </Tooltip>
+        <Tooltip content="設定中の共有範囲を確認できます" side="top">
+          <button type="button" className={buttonClass} aria-label="共有範囲の補足">
+            <span aria-hidden="true" className="font-bold text-catalog-muted">
+              ?
+            </span>
+          </button>
+        </Tooltip>
+      </div>
+      <p className="text-center text-xs text-catalog-muted">
+        ホバーまたはフォーカスで説明を表示できます。
+      </p>
+    </div>
+  );
+}
+
 export const previews = {
   "app-button": ButtonPreview,
   "text-input": TextPreview,
@@ -559,6 +672,9 @@ export const previews = {
   "avatar-group": AvatarGroupPreview,
   "save-status-indicator": SaveStatusPreview,
   "option-group": OptionGroupPreview,
+  tabs: TabsPreview,
+  toast: ToastPreview,
+  tooltip: TooltipPreview,
   breadcrumb: BreadcrumbPreview,
 };
 
@@ -691,6 +807,33 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
           ariaLabel="共有範囲"
           className="gap-1.5"
         />
+      );
+    case "tabs":
+      return (
+        <Tabs
+          tabs={documentTabs.slice(0, 2).map((tab) => ({ ...tab, panel: null }))}
+          value="individual"
+          onChange={() => {}}
+          ariaLabel="資料の範囲"
+        />
+      );
+    case "toast":
+      return (
+        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-800 shadow-sm">
+          <CheckIcon />
+          フォルダを作成しました
+        </div>
+      );
+    case "tooltip":
+      return (
+        <div className="grid justify-items-center gap-1.5">
+          <span className="grid size-8 place-items-center rounded-md border border-catalog-line bg-white">
+            <EyeIcon />
+          </span>
+          <span className="rounded bg-gray-900 px-2 py-1 text-xs text-white">
+            作成理由ハイライトを表示
+          </span>
+        </div>
       );
     case "breadcrumb":
       return (

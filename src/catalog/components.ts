@@ -1,11 +1,14 @@
 import {
   AlignLeft,
+  AppWindow,
+  Bell,
   CheckSquare,
   CloudUpload,
   ChevronRight,
   ChevronsUpDown,
   EllipsisVertical,
   FileSearch,
+  Info,
   ListChecks,
   LoaderCircle,
   MousePointer2,
@@ -432,6 +435,79 @@ import { SaveStatusIndicator } from "./ui/SaveStatusIndicator";
     { value: "team", label: "チーム", description: "メンバーが閲覧できます" },
   ]}
 />`,
+  },
+  {
+    id: "tabs",
+    name: "Tabs",
+    label: "タブ",
+    category: "ナビゲーション",
+    icon: AppWindow,
+    description: "同じ画面内で、関連する表示内容を切り替えます。",
+    guidance: [
+      "資料選択画面の「PJ個別データ」「全体共通データ」のように、表示対象の違いを短いラベルで示します。",
+      "左右キー、Home、End で切り替えられます。利用できないタブには disabled を指定します。",
+      "タブを切り替えても作業を続けられるよう、入力や選択の状態を必要に応じて保持します。",
+    ],
+    variants: ["選択中", "未選択", "無効", "キーボード操作"],
+    file: "Tabs.tsx",
+    code: `import { Tabs } from "./ui/Tabs";
+
+<Tabs
+  ariaLabel="資料の範囲"
+  value={activeTab}
+  onChange={setActiveTab}
+  tabs={[
+    { value: "individual", label: "PJ個別データ", panel: <ProjectFiles /> },
+    { value: "shared", label: "全体共通データ", panel: <SharedFiles /> },
+  ]}
+/>`,
+  },
+  {
+    id: "toast",
+    name: "AppToaster",
+    label: "トースト",
+    category: "状態表示",
+    icon: Bell,
+    description: "操作の結果を、画面右上に短時間表示します。",
+    guidance: [
+      "アプリ全体に AppToaster を1つ配置し、処理結果に応じて toast.success、toast.warning、toast.error を使います。",
+      "何が起きたかを短く書きます。例として、成功なら「フォルダを作成しました」、失敗なら「ファイルを移動できませんでした」です。",
+      "入力の修正が必要な場合は、該当項目の近くにも修正方法を表示します。",
+    ],
+    variants: ["成功", "注意", "エラー"],
+    file: "Toast.tsx",
+    code: `import { AppToaster, toast } from "./ui/Toast";
+
+// アプリのルートレイアウトに1回だけ配置
+<AppToaster />
+
+// 操作結果に合わせて呼び出す
+toast.success("フォルダを作成しました");
+toast.warning("PPTXファイルを選択してください");
+toast.error("ファイルを移動できませんでした");`,
+  },
+  {
+    id: "tooltip",
+    name: "Tooltip",
+    label: "ツールチップ",
+    category: "状態表示",
+    icon: Info,
+    description: "アイコンや操作ボタンの意味を短く補足します。",
+    guidance: [
+      "成果物ヘッダーの「作成理由ハイライト」のように、操作の補足に使います。",
+      "ホバーまたはキーボードでフォーカスすると表示され、Esc で閉じられます。",
+      "アイコンボタンには aria-label を付けます。必須の説明は画面上にも表示します。",
+    ],
+    variants: ["ホバー", "フォーカス", "上・下に表示"],
+    file: "Tooltip.tsx",
+    code: `import { Tooltip } from "./ui/Tooltip";
+import { EyeIcon } from "./ui/icons";
+
+<Tooltip content="作成理由ハイライトを表示">
+  <button type="button" aria-label="作成理由ハイライト" onClick={toggleHighlight}>
+    <EyeIcon />
+  </button>
+</Tooltip>`,
   },
   {
     id: "breadcrumb",
