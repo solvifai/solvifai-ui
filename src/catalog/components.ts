@@ -4,7 +4,9 @@ import {
   Bell,
   CheckSquare,
   CloudUpload,
+  CircleDot,
   ChevronRight,
+  ChevronDown,
   ChevronsUpDown,
   EllipsisVertical,
   FileSearch,
@@ -17,6 +19,7 @@ import {
   StepForward,
   Search,
   Tag,
+  ToggleRight,
   Table2,
   Users,
   type LucideIcon,
@@ -508,6 +511,69 @@ import { EyeIcon } from "./ui/icons";
     <EyeIcon />
   </button>
 </Tooltip>`,
+  },
+  {
+    id: "radio",
+    name: "Radio",
+    label: "ラジオボタン",
+    category: "入力",
+    icon: CircleDot,
+    description: "フォルダ分類など、並べた選択肢から1つを選びます。",
+    guidance: [
+      "同じ質問の選択肢には同じ name を付け、fieldset と legend でまとめます。",
+      "行全体をクリックして選べます。キーボードでは矢印キーで同じグループの選択を切り替えます。",
+      "利用できない選択肢には disabled を指定します。",
+    ],
+    variants: ["未選択", "選択済み", "無効"],
+    file: "Radio.tsx",
+    code: `import { Radio } from "./ui/Radio";
+
+<fieldset>
+  <legend>フォルダ分類</legend>
+  <Radio name="folder-type" value="project" label="PJ個別データ" defaultChecked />
+  <Radio name="folder-type" value="shared" label="全体共有データ" />
+</fieldset>`,
+  },
+  {
+    id: "toggle",
+    name: "Toggle",
+    label: "トグル",
+    category: "入力",
+    icon: ToggleRight,
+    description: "手引きパネルの「高精度」のような設定をオン・オフに切り替えます。",
+    guidance: [
+      "切り替える機能名をラベルと ariaLabel に指定します。",
+      "状態を切り替えてもラベルは同じにします。現在の状態はつまみの位置と aria-checked で示します。",
+      "切り替えできない場合には disabled を指定します。",
+    ],
+    variants: ["オン", "オフ", "無効"],
+    file: "Toggle.tsx",
+    code: `import { Toggle } from "./ui/Toggle";
+
+<Toggle ariaLabel="高精度" checked={highAccuracy} onChange={setHighAccuracy} />`,
+  },
+  {
+    id: "accordion",
+    name: "Accordion",
+    label: "アコーディオン",
+    category: "ナビゲーション",
+    icon: ChevronDown,
+    description: "編集ガイドのステップのように、見出しごとに内容を開閉します。",
+    guidance: [
+      "見出しだけで何が入っているか分かる文言を使い、詳しい説明や項目を中に置きます。",
+      "クリックや Enter・Space で開閉します。初期表示から見せたい項目には open を指定します。",
+      "項目を1つずつ開く場合は、同じグループの項目に共通の name を指定します。",
+    ],
+    variants: ["閉じる", "開く", "複数項目"],
+    file: "Accordion.tsx",
+    code: `import { Accordion } from "./ui/Accordion";
+
+<Accordion heading="構成を確認する" open>
+  目次の見出しと順序を確認します。
+</Accordion>
+<Accordion heading="表記を整える">
+  固有名詞や表記の揺れを確認します。
+</Accordion>`,
   },
   {
     id: "breadcrumb",

@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowLeft, ArrowUp, FileText, Plus } from "lucide-react";
 import { useId, useState } from "react";
 
+import { Accordion } from "../ui/Accordion";
 import { AppButton } from "../ui/AppButton";
 import { AvatarGroup, type AvatarGroupMember } from "../ui/AvatarGroup";
 import { Badge } from "../ui/Badge";
@@ -21,6 +22,7 @@ import { FormField } from "../ui/FormField";
 import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon, TrashIcon } from "../ui/icons";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { OptionGroup, type OptionGroupOption } from "../ui/OptionGroup";
+import { Radio } from "../ui/Radio";
 import { RowActionMenu } from "../ui/RowActionMenu";
 import { SaveStatusIndicator, type SaveStatus } from "../ui/SaveStatusIndicator";
 import { SearchInput } from "../ui/SearchInput";
@@ -31,6 +33,7 @@ import { TablePagination } from "../ui/TablePagination";
 import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
 import { TextInput } from "../ui/TextInput";
 import { AppToaster, toast } from "../ui/Toast";
+import { Toggle } from "../ui/Toggle";
 import { Tooltip } from "../ui/Tooltip";
 
 function ButtonPreview() {
@@ -655,6 +658,71 @@ function TooltipPreview() {
   );
 }
 
+function RadioPreview() {
+  const name = useId();
+  const [category, setCategory] = useState("project");
+
+  return (
+    <fieldset className="grid w-full max-w-sm gap-2 rounded-lg border border-catalog-line bg-white p-3">
+      <legend className="px-1 text-sm font-semibold">フォルダ分類</legend>
+      <Radio
+        name={name}
+        value="project"
+        label="PJ個別データ"
+        checked={category === "project"}
+        onChange={(event) => setCategory(event.currentTarget.value)}
+      />
+      <Radio
+        name={name}
+        value="shared"
+        label="全体共有データ"
+        checked={category === "shared"}
+        onChange={(event) => setCategory(event.currentTarget.value)}
+      />
+      <Radio name={name} value="restricted" label="権限のない分類" disabled />
+    </fieldset>
+  );
+}
+
+function TogglePreview() {
+  const [highAccuracy, setHighAccuracy] = useState(true);
+
+  return (
+    <div className="w-full max-w-sm divide-y divide-catalog-line rounded-lg border border-catalog-line bg-white px-3">
+      <div className="flex min-h-12 items-center justify-between gap-2 text-sm">
+        <span className="font-medium">表の生成</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-catalog-muted">高精度</span>
+          <Toggle ariaLabel="表の生成の高精度" checked={highAccuracy} onChange={setHighAccuracy} />
+        </div>
+      </div>
+      <div className="flex min-h-12 items-center justify-between gap-2 text-sm">
+        <span className="font-medium">グラフの生成</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-catalog-muted">高精度</span>
+          <Toggle ariaLabel="グラフの生成の高精度" checked={false} onChange={() => {}} disabled />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AccordionPreview() {
+  return (
+    <div className="grid w-full max-w-lg gap-2">
+      <Accordion heading="構成を確認する" open>
+        <p>目次の見出しと順序を確認します。</p>
+      </Accordion>
+      <Accordion heading="データの整合性を確認する">
+        <p>表の数値や単位を、参照資料と照合します。</p>
+      </Accordion>
+      <Accordion heading="表記を整える">
+        <p>固有名詞や表記の揺れを確認します。</p>
+      </Accordion>
+    </div>
+  );
+}
+
 export const previews = {
   "app-button": ButtonPreview,
   "text-input": TextPreview,
@@ -675,6 +743,9 @@ export const previews = {
   tabs: TabsPreview,
   toast: ToastPreview,
   tooltip: TooltipPreview,
+  radio: RadioPreview,
+  toggle: TogglePreview,
+  accordion: AccordionPreview,
   breadcrumb: BreadcrumbPreview,
 };
 
@@ -833,6 +904,27 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
           <span className="rounded bg-gray-900 px-2 py-1 text-xs text-white">
             作成理由ハイライトを表示
           </span>
+        </div>
+      );
+    case "radio":
+      return (
+        <div className="grid w-fit max-w-full gap-1.5">
+          <Radio label="PJ個別データ" defaultChecked className="bg-white py-2" />
+          <Radio label="全体共有データ" className="bg-white py-2" />
+        </div>
+      );
+    case "toggle":
+      return (
+        <div className="flex items-center gap-2 rounded-lg border border-catalog-line bg-white px-3 py-1">
+          <span className="text-xs text-catalog-muted">高精度</span>
+          <Toggle ariaLabel="高精度" checked onChange={() => {}} />
+        </div>
+      );
+    case "accordion":
+      return (
+        <div className="grid w-full max-w-48 gap-1.5">
+          <Accordion heading="構成を確認する" />
+          <Accordion heading="表記を整える" />
         </div>
       );
     case "breadcrumb":
