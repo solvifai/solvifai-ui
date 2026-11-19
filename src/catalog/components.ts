@@ -3,12 +3,14 @@ import {
   AppWindow,
   Bell,
   CheckSquare,
+  CalendarDays,
   CloudUpload,
   CircleDot,
   ChevronRight,
   ChevronDown,
   ChevronsUpDown,
   EllipsisVertical,
+  GripVertical,
   FileSearch,
   Info,
   Gauge,
@@ -21,6 +23,7 @@ import {
   StepForward,
   Search,
   Tag,
+  TextCursorInput,
   ToggleRight,
   Table2,
   Users,
@@ -646,6 +649,84 @@ import { EyeIcon } from "./ui/icons";
     <FormatSelect />
   </Step>
 </SteppedForm>`,
+  },
+  {
+    id: "text-area",
+    name: "TextArea",
+    label: "テキストエリア",
+    category: "入力",
+    icon: TextCursorInput,
+    description: "プロジェクトの概要や手引きなど、複数行の文章を入力します。",
+    guidance: [
+      "概要など複数行が必要な場合に使い、FormField で入力項目の名前を示します。",
+      "rows で初期の高さ、maxLength で文字数の上限を指定できます。",
+      "エラー時は aria-invalid と aria-describedby で、修正方法を入力欄と関連付けます。",
+    ],
+    variants: ["未入力", "複数行", "エラー", "読み取り専用"],
+    file: "TextArea.tsx",
+    code: `import { FormField } from "./ui/FormField";
+import { TextArea } from "./ui/TextArea";
+
+<FormField label="概要" htmlFor="overview">
+  <TextArea
+    id="overview"
+    rows={3}
+    value={description}
+    onChange={(event) => setDescription(event.currentTarget.value)}
+    placeholder="プロジェクトの目的や概要を入力してください"
+  />
+</FormField>`,
+  },
+  {
+    id: "date-picker",
+    name: "DatePicker",
+    label: "日付ピッカー",
+    category: "入力",
+    icon: CalendarDays,
+    description: "プロジェクト期間などの日付を、ブラウザのカレンダーまたはキーボードで指定します。",
+    guidance: [
+      "ラベルで「開始日」「終了日」のように、指定する対象を示します。",
+      "値は YYYY-MM-DD 形式です。終了日には開始日を min として渡せます。",
+      "カレンダーの見た目と入力順は、ブラウザや端末の設定に従います。",
+    ],
+    variants: ["日付入力", "開始日と終了日", "範囲エラー"],
+    file: "DatePicker.tsx",
+    code: `import { DatePicker } from "./ui/DatePicker";
+
+<DatePicker
+  aria-label="終了日"
+  min={startDate || undefined}
+  value={endDate}
+  onChange={(event) => setEndDate(event.currentTarget.value)}
+/>`,
+  },
+  {
+    id: "resizable-panel",
+    name: "ResizeDivider",
+    label: "リサイズできるパネル",
+    category: "ナビゲーション",
+    icon: GripVertical,
+    description: "フォーマット編集画面と同じように、境界を動かしてパネルの幅を調整します。",
+    guidance: [
+      "左右の領域の境界に置き、position で幅を変えるパネルの側を指定します。",
+      "親で幅を保持し、min と max で各領域に必要な幅を確保します。",
+      "ドラッグとタッチのほか、左右キーで8px、Shift＋左右キーで32px調整できます。Home と End で上下限に移動します。",
+    ],
+    variants: ["ドラッグ", "タッチ", "キーボード", "最小・最大幅"],
+    file: "ResizeDivider.tsx",
+    code: `import { ResizeDivider } from "./ui/ResizeDivider";
+
+<ResizeDivider
+  position="left"
+  ariaLabel="スライド一覧の幅"
+  controls="slide-preview-panel"
+  min={120}
+  max={400}
+  value={width}
+  onResize={(delta) =>
+    setWidth((previous) => Math.max(120, Math.min(400, previous + delta)))
+  }
+/>`,
   },
   {
     id: "breadcrumb",

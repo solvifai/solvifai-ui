@@ -1,11 +1,12 @@
 import { ArrowDown, ArrowLeft, ArrowUp, FileText, Plus } from "lucide-react";
-import { useId, useState } from "react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 
 import { Accordion } from "../ui/Accordion";
 import { AppButton } from "../ui/AppButton";
 import { AvatarGroup, type AvatarGroupMember } from "../ui/AvatarGroup";
 import { Badge } from "../ui/Badge";
 import { Checkbox } from "../ui/Checkbox";
+import { DatePicker } from "../ui/DatePicker";
 import {
   Dialog,
   DialogClose,
@@ -25,6 +26,7 @@ import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { OptionGroup, type OptionGroupOption } from "../ui/OptionGroup";
 import { ProgressBar } from "../ui/ProgressBar";
 import { Radio } from "../ui/Radio";
+import { ResizeDivider } from "../ui/ResizeDivider";
 import { RowActionMenu } from "../ui/RowActionMenu";
 import { SaveStatusIndicator, type SaveStatus } from "../ui/SaveStatusIndicator";
 import { SearchInput } from "../ui/SearchInput";
@@ -34,6 +36,7 @@ import { Table } from "../ui/Table";
 import { Tabs, type TabItem } from "../ui/Tabs";
 import { TablePagination } from "../ui/TablePagination";
 import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
+import { TextArea } from "../ui/TextArea";
 import { TextInput } from "../ui/TextInput";
 import { AppToaster, toast } from "../ui/Toast";
 import { Toggle } from "../ui/Toggle";
@@ -820,6 +823,170 @@ function SteppedFormPreview() {
   );
 }
 
+function TextAreaPreview() {
+  const [description, setDescription] = useState("");
+  const [note, setNote] = useState("");
+  const id = useId();
+  const invalid = note.trim() === "";
+
+  return (
+    <div className="grid w-full max-w-xl gap-4 sm:grid-cols-2">
+      <FormField label="概要" htmlFor={id + "-description"}>
+        <TextArea
+          id={id + "-description"}
+          value={description}
+          onChange={(event) => setDescription(event.currentTarget.value)}
+          placeholder="プロジェクトの目的や概要を入力してください"
+          maxLength={140}
+        />
+        <p className="text-right text-xs text-text-muted">{description.length} / 140文字</p>
+      </FormField>
+      <FormField label="共有時の注意（必須）" htmlFor={id + "-note"}>
+        <TextArea
+          id={id + "-note"}
+          required
+          value={note}
+          onChange={(event) => setNote(event.currentTarget.value)}
+          aria-invalid={invalid || undefined}
+          aria-describedby={invalid ? id + "-error" : undefined}
+        />
+        {invalid ? (
+          <p id={id + "-error"} className="demo-error">
+            共有時の注意を入力してください。
+          </p>
+        ) : null}
+      </FormField>
+      <FormField
+        className="sm:col-span-2"
+        label="登録済みの手引き（読み取り専用）"
+        htmlFor={id + "-readonly"}
+      >
+        <TextArea
+          id={id + "-readonly"}
+          rows={2}
+          value={"先月との変化を短く説明します。\n数値の出典を併記します。"}
+          readOnly
+        />
+      </FormField>
+    </div>
+  );
+}
+
+function DatePickerPreview() {
+  const [start, setStart] = useState("2026-11-01");
+  const [end, setEnd] = useState("");
+  const id = useId();
+  const invalid = Boolean(start && end && Date.parse(end) < Date.parse(start));
+
+  return (
+    <div className="grid w-full max-w-md gap-3 sm:grid-cols-2">
+      <FormField label="開始日" htmlFor={id + "-start"}>
+        <DatePicker
+          id={id + "-start"}
+          value={start}
+          onChange={(event) => setStart(event.currentTarget.value)}
+        />
+      </FormField>
+      <FormField label="終了日" htmlFor={id + "-end"}>
+        <DatePicker
+          id={id + "-end"}
+          min={start || undefined}
+          value={end}
+          onChange={(event) => setEnd(event.currentTarget.value)}
+          aria-invalid={invalid || undefined}
+          aria-describedby={invalid ? id + "-error" : undefined}
+        />
+        {invalid ? (
+          <p id={id + "-error"} className="demo-error">
+            終了日は開始日以降を選んでください。
+          </p>
+        ) : null}
+      </FormField>
+    </div>
+  );
+}
+
+function ResizePanelPreview() {
+  const container = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(520);
+  const [requestedWidth, setRequestedWidth] = useState<number | null>(null);
+  const panelId = useId();
+
+  useLayoutEffect(() => {
+    const element = container.current;
+    if (!element) return;
+    setContainerWidth(element.clientWidth);
+    const resize = new ResizeObserver(([entry]) => {
+      setContainerWidth(Math.floor(entry.contentRect.width));
+    });
+    resize.observe(element);
+    return () => resize.disconnect();
+  }, []);
+
+  const available = Math.max(0, containerWidth - 12);
+  const min = Math.min(120, Math.floor(available * 0.4));
+  const max = Math.max(min, available - min);
+  const initial = Math.round(available * 0.36);
+  const clampWidth = (width: number) => Math.max(min, Math.min(max, width));
+  const width = clampWidth(requestedWidth ?? initial);
+
+  return (
+    <div className="grid w-full max-w-xl gap-2">
+      <div
+        ref={container}
+        className="flex h-52 overflow-hidden rounded-lg border border-catalog-line bg-white"
+      >
+        <aside
+          id={panelId}
+          style={{ width }}
+          className="shrink-0 overflow-y-auto bg-product-bg p-2"
+        >
+          <p className="mb-2 text-xs font-semibold">スライド一覧</p>
+          {["概要", "結果"].map((title) => (
+            <div
+              key={title}
+              className="mb-2 rounded border border-catalog-line bg-white p-2 text-xs"
+            >
+              <div className="mb-1 h-2 w-2/3 rounded bg-blue-100" />
+              {title}
+            </div>
+          ))}
+        </aside>
+        <ResizeDivider
+          position="left"
+          ariaLabel="スライド一覧の幅を調整"
+          controls={panelId}
+          value={width}
+          min={min}
+          max={max}
+          onResize={(delta) =>
+            setRequestedWidth((previous) => clampWidth(clampWidth(previous ?? initial) + delta))
+          }
+        />
+        <section className="min-w-0 flex-1 overflow-auto p-3">
+          <p className="mb-4 text-xs font-semibold">編集エリア</p>
+          <div className="grid gap-2 rounded-lg border border-catalog-line p-3">
+            <span className="text-sm font-medium">月次レポート</span>
+            <div className="h-2 w-4/5 rounded bg-blue-100" />
+            <div className="h-2 w-2/3 rounded bg-gray-100" />
+          </div>
+        </section>
+      </div>
+      <div className="flex items-center justify-between gap-2 text-xs text-text-muted">
+        <span>スライド一覧の幅 {width}px</span>
+        <button
+          type="button"
+          className="rounded px-2 py-1 text-catalog-blue hover:bg-blue-50 disabled:opacity-50"
+          onClick={() => setRequestedWidth(null)}
+          disabled={requestedWidth === null}
+        >
+          幅を元に戻す
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export const previews = {
   "app-button": ButtonPreview,
   "text-input": TextPreview,
@@ -846,6 +1013,9 @@ export const previews = {
   "file-upload": FileUploadPreview,
   "progress-bar": ProgressBarPreview,
   "stepped-form": SteppedFormPreview,
+  "text-area": TextAreaPreview,
+  "date-picker": DatePickerPreview,
+  "resizable-panel": ResizePanelPreview,
   breadcrumb: BreadcrumbPreview,
 };
 
@@ -1044,6 +1214,33 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
           <Step title="基本情報" complete />
           <Step title="フォーマット" complete={false} />
         </SteppedForm>
+      );
+    case "text-area":
+      return (
+        <TextArea
+          aria-label="概要"
+          rows={2}
+          value={"資料の概要を入力できます。\n複数行の入力に対応します。"}
+          readOnly
+          className="w-full max-w-64 !bg-white !text-xs"
+        />
+      );
+    case "date-picker":
+      return <DatePicker aria-label="開始日" defaultValue="2026-11-01" className="max-w-48" />;
+    case "resizable-panel":
+      return (
+        <div className="flex h-16 w-full max-w-60 overflow-hidden rounded-lg border border-catalog-line bg-white text-xs">
+          <span className="grid flex-1 place-items-center bg-product-bg">一覧</span>
+          <ResizeDivider
+            position="left"
+            ariaLabel="一覧の幅"
+            value={80}
+            min={60}
+            max={150}
+            onResize={() => {}}
+          />
+          <span className="grid flex-2 place-items-center">編集</span>
+        </div>
       );
     case "breadcrumb":
       return (

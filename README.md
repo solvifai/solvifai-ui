@@ -23,7 +23,7 @@ npm run dev
 - `src/ui/FileTypeIcon.tsx` にファイル形式の対応と画像の配信元を置きます。Officeなどの画像は [Microsoft Fluent UI CDN](https://github.com/microsoft/fluentui-system-icons/tree/main/packages/react-icons-file-type) を、PDF画像は [Google Drive](https://developers.google.com/workspace/drive/api/reference/rest/v3/files#File.FIELDS.icon_link) の配信元を参照します。
 - `src/catalog/guidelines.md` に人とAIで共有するUIルールを置きます。
 
-AppButton、TextInputとFormField、SearchInput、SelectBox、Checkbox、Badge、Dialog、LoadingSpinner、SimpleEmptyState、SimpleBreadcrumb、RowActionMenu、TablePagination、Table、FileChipList、AvatarGroup、SaveStatusIndicator、OptionGroup、Tabs、AppToaster、Tooltip、Radio、Toggle、Accordion、FileUpload、ProgressBar、SteppedForm を収録しています。動作例は `src/ui/` の実装を直接使います。サンプルデータは架空です。[ファイル一覧サンプル](https://solvifai.github.io/solvifai-ui/#file-list) では、検索・行選択・三点メニュー・ページ送りをまとめて試せます。
+AppButton、TextInputとFormField、SearchInput、SelectBox、Checkbox、Badge、Dialog、LoadingSpinner、SimpleEmptyState、SimpleBreadcrumb、RowActionMenu、TablePagination、Table、FileChipList、AvatarGroup、SaveStatusIndicator、OptionGroup、Tabs、AppToaster、Tooltip、Radio、Toggle、Accordion、FileUpload、ProgressBar、SteppedForm、TextArea、DatePicker、ResizeDivider を収録しています。動作例は `src/ui/` の実装を直接使います。サンプルデータは架空です。[ファイル一覧サンプル](https://solvifai.github.io/solvifai-ui/#file-list) では、検索・行選択・三点メニュー・ページ送りをまとめて試せます。
 
 基準はSolvifAIの `main` にある `frontend/src/components/{common,form,shadcn}` と `frontend/tailwind.config.js` です。抽出時に参照先をローカルに置き換え、フォーカス、入力エラー、読み上げ、ダイアログの開閉を補い、小さな文字のコントラストを調整しています。SelectBox は Excel の複数表設定で使う `MultiTableOutputSelect` のドロップダウンを共通化したものです。現時点でnpm配布や製品への取り込みは行っていません。
 
@@ -34,3 +34,5 @@ Tabs は資料選択モーダル、AppToaster は本体の Sonner 設定、Toolt
 Radio は本体のフォルダ分類、Toggle は手引きパネルの高精度設定、Accordion は編集ガイドの開閉がベースです。
 
 FileUpload はフォーマット作成時のPPTXアップロード、ProgressBar はスライド生成時の進捗表示、SteppedForm は成果物作成フォームがベースです。
+
+TextArea と DatePicker はプロジェクト編集の概要・期間入力、ResizeDivider はフォーマット編集画面のパネル幅調整がベースです。
