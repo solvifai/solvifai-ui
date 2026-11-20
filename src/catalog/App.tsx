@@ -21,10 +21,10 @@ import { SearchInput } from "../ui/SearchInput";
 import { SimpleEmptyState } from "../ui/EmptyState";
 import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
 import { categories, components, type Category, type ComponentEntry } from "./components";
-import { FileList, fileListPatterns } from "./FileList";
 import guide from "./guidelines.md?raw";
 import guideUrl from "./guidelines.md?url&no-inline";
 import { brandSymbolUrl, Icons } from "./Icons";
+import { PatternPage, patterns } from "./Patterns";
 import { CardPreview, HeroPreview, previews } from "./previews";
 
 const repository = "https://github.com/solvifai/solvifai-ui";
@@ -65,7 +65,7 @@ function Sidebar({ hash, isOpen, close }: { hash: string; isOpen: boolean; close
           </a>
         ))}
         <div className="sidebar-label">Patterns</div>
-        {fileListPatterns.map(({ href, label, icon: Icon }) => (
+        {patterns.map(({ href, label, icon: Icon }) => (
           <a
             key={href}
             href={href}
@@ -397,7 +397,7 @@ export function App() {
   const [hash, setHash] = useState(() => window.location.hash || "#components");
   const [mobileOpen, setMobileOpen] = useState(false);
   const entry = components.find(({ id }) => "#" + id === hash);
-  const pattern = fileListPatterns.find(({ href }) => href === hash);
+  const pattern = patterns.find(({ href }) => href === hash);
   const category = categories.find((item) => categoryLinks[item] === hash) ?? "すべて";
   const title =
     entry?.label ??
@@ -426,7 +426,7 @@ export function App() {
 
   let content = <Catalog category={category} />;
   if (entry) content = <Detail key={entry.id} entry={entry} />;
-  if (pattern) content = <FileList key={pattern.href} pattern={pattern} />;
+  if (pattern) content = <PatternPage key={pattern.href} pattern={pattern} />;
   if (hash === "#tokens") content = <Tokens />;
   if (hash === "#guidelines") content = <Guidelines />;
   if (hash === "#icons") content = <Icons sourceBase={repository + "/blob/main/src/ui"} />;

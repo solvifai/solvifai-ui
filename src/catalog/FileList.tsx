@@ -1,4 +1,4 @@
-import { ListChecks, Search, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useRef, useState } from "react";
 
 import { AppButton } from "../ui/AppButton";
@@ -28,33 +28,10 @@ const sampleFiles = [
   { id: 13, name: "工作の手順.pdf", date: "2026-11-08", size: "377 KB" },
 ];
 
-export const fileListPatterns = [
-  {
-    href: "#file-list",
-    label: "複数選択と一括削除",
-    icon: ListChecks,
-    description:
-      "ファイルを複数選び、まとめて削除する前に対象を確認できます。選択は検索やページ送りをしても保持されます。",
-    initialQuery: "",
-  },
-  {
-    href: "#pattern-search-empty",
-    label: "検索結果が0件",
-    icon: Search,
-    description:
-      "一致するファイルがないときに、結果が0件であることと次にできる操作を表示します。検索をクリアすると一覧に戻ります。",
-    initialQuery: "見本にない名前",
-  },
-];
-
 const pageSize = 5;
 const deleteActionStyle = "text-rose-700 hover:bg-rose-50 focus-visible:ring-rose-600";
 
-export function FileList({
-  pattern: { label, icon: Icon, description, initialQuery },
-}: {
-  pattern: (typeof fileListPatterns)[number];
-}) {
+export function FileList({ initialQuery = "" }: { initialQuery?: string }) {
   const [files, setFiles] = useState(sampleFiles);
   const [query, setQuery] = useState(initialQuery);
   const [requestedPage, setPage] = useState(1);
@@ -122,14 +99,7 @@ export function FileList({
   }
 
   return (
-    <div className="document-page">
-      <header className="document-heading">
-        <span className="document-kicker">
-          <Icon size={18} aria-hidden="true" /> Patterns
-        </span>
-        <h1>{label}</h1>
-        <p>{description}</p>
-      </header>
+    <>
       <section
         className="mt-2 rounded-xl border border-catalog-line bg-white"
         aria-labelledby="file-list-heading"
@@ -357,6 +327,6 @@ export function FileList({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
