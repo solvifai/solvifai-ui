@@ -35,6 +35,9 @@ Patterns では、架空のファイル一覧やメモで共通UIを組み合わ
 - [期間フィルター](https://solvifai.github.io/solvifai-ui/#pattern-date-filter) — 開始日と終了日を含む期間で一覧を絞り込み、期間の修正や解除を試せます。
 - [アプリヘッダー](https://solvifai.github.io/solvifai-ui/#pattern-app-header) — セクションの切り替えと、どのセクションからも使えるお知らせを試せます。
 - [ページヘッダーと一覧ツールバー](https://solvifai.github.io/solvifai-ui/#pattern-page-header) — パンくず、ページの主操作、一覧の検索・絞り込みを組み合わせた例です。
+- [サイドナビ](https://solvifai.github.io/solvifai-ui/#pattern-side-nav) — 現在地の表示、項目グループの開閉、狭い画面でのメニュー操作を試せます。
+- [一覧と詳細パネル](https://solvifai.github.io/solvifai-ui/#pattern-list-detail) — 詳細を閉じると検索条件を保ったまま元の項目へ戻れます。
+- [確認付きステップフォーム](https://solvifai.github.io/solvifai-ui/#pattern-step-review) — 入力、確認、完了の流れと、確認から戻って入力を修正する操作を試せます。
 
 基準はSolvifAIの `main` にある `frontend/src/components/{common,form,shadcn}` と `frontend/tailwind.config.js` です。抽出時に参照先をローカルに置き換え、フォーカス、入力エラー、読み上げ、ダイアログの開閉を補い、小さな文字のコントラストを調整しています。SelectBox は Excel の複数表設定で使う `MultiTableOutputSelect` のドロップダウンを共通化したものです。現時点でnpm配布や製品への取り込みは行っていません。
 

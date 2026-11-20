@@ -1,11 +1,17 @@
-import { CalendarRange, Cloud, LayoutList, ListChecks, PanelsTopLeft, RotateCw, Search, Upload } from "lucide-react";
+import {
+  CalendarRange, Cloud, LayoutList, ListChecks, PanelLeft, PanelRight, PanelsTopLeft,
+  RotateCw, Search, Signpost, Upload,
+} from "lucide-react";
 
 import { AppHeaderDemo } from "./AppHeaderDemo";
 import { AutosaveDemo } from "./AutosaveDemo";
 import { DateFilterDemo } from "./DateFilterDemo";
 import { FileList } from "./FileList";
 import { LoadingRetryDemo } from "./LoadingRetryDemo";
+import { ListDetailDemo } from "./ListDetailDemo";
 import { PageHeaderDemo } from "./PageHeaderDemo";
+import { SideNavDemo } from "./SideNavDemo";
+import { StepReviewDemo } from "./StepReviewDemo";
 import { UploadDemo } from "./UploadDemo";
 
 export const patterns = [
@@ -67,6 +73,27 @@ export const patterns = [
     icon: LayoutList,
     description: "パンくず、タイトル、主操作をページ上部に置き、一覧の検索と絞り込みをその下にまとめます。",
     demo: <PageHeaderDemo />,
+  },
+  {
+    href: "#pattern-side-nav",
+    label: "サイドナビ",
+    icon: PanelLeft,
+    description: "現在地を強調し、関連する項目をグループにまとめます。狭い画面ではメニューを開いて移動できます。",
+    demo: <SideNavDemo />,
+  },
+  {
+    href: "#pattern-list-detail",
+    label: "一覧と詳細パネル",
+    icon: PanelRight,
+    description: "一覧から詳細を開きます。閉じると検索条件を保ったまま、元の項目に戻れます。",
+    demo: <ListDetailDemo />,
+  },
+  {
+    href: "#pattern-step-review",
+    label: "確認付きステップフォーム",
+    icon: Signpost,
+    description: "入力内容を確認してから申し込みます。確認画面から戻っても入力内容は保持されます。",
+    demo: <StepReviewDemo />,
   },
 ];
 
