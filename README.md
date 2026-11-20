@@ -33,6 +33,8 @@ Patterns では、架空のファイル一覧やメモで共通UIを組み合わ
 - [自動保存](https://solvifai.github.io/solvifai-ui/#pattern-autosave) — メモはこのブラウザに自動保存されます。失敗を再現して、入力を保持したまま保存を再試行できます。
 - [複数ファイルのアップロード](https://solvifai.github.io/solvifai-ui/#pattern-file-upload) — 模擬アップロードの進捗と結果をファイルごとに表示し、失敗したファイルだけを再試行できます。
 - [期間フィルター](https://solvifai.github.io/solvifai-ui/#pattern-date-filter) — 開始日と終了日を含む期間で一覧を絞り込み、期間の修正や解除を試せます。
+- [アプリヘッダー](https://solvifai.github.io/solvifai-ui/#pattern-app-header) — セクションの切り替えと、どのセクションからも使えるお知らせを試せます。
+- [ページヘッダーと一覧ツールバー](https://solvifai.github.io/solvifai-ui/#pattern-page-header) — パンくず、ページの主操作、一覧の検索・絞り込みを組み合わせた例です。
 
 基準はSolvifAIの `main` にある `frontend/src/components/{common,form,shadcn}` と `frontend/tailwind.config.js` です。抽出時に参照先をローカルに置き換え、フォーカス、入力エラー、読み上げ、ダイアログの開閉を補い、小さな文字のコントラストを調整しています。SelectBox は Excel の複数表設定で使う `MultiTableOutputSelect` のドロップダウンを共通化したものです。現時点でnpm配布や製品への取り込みは行っていません。
 

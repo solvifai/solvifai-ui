@@ -1,9 +1,11 @@
-import { CalendarRange, Cloud, ListChecks, RotateCw, Search, Upload } from "lucide-react";
+import { CalendarRange, Cloud, LayoutList, ListChecks, PanelsTopLeft, RotateCw, Search, Upload } from "lucide-react";
 
+import { AppHeaderDemo } from "./AppHeaderDemo";
 import { AutosaveDemo } from "./AutosaveDemo";
 import { DateFilterDemo } from "./DateFilterDemo";
 import { FileList } from "./FileList";
 import { LoadingRetryDemo } from "./LoadingRetryDemo";
+import { PageHeaderDemo } from "./PageHeaderDemo";
 import { UploadDemo } from "./UploadDemo";
 
 export const patterns = [
@@ -51,6 +53,20 @@ export const patterns = [
     icon: CalendarRange,
     description: "開始日と終了日を含む期間で一覧を絞り込みます。「期間を解除」で全件に戻ります。",
     demo: <DateFilterDemo />,
+  },
+  {
+    href: "#pattern-app-header",
+    label: "アプリヘッダー",
+    icon: PanelsTopLeft,
+    description: "アプリ名、セクションの切り替え、どのセクションからも開けるお知らせをまとめたデモです。",
+    demo: <AppHeaderDemo />,
+  },
+  {
+    href: "#pattern-page-header",
+    label: "ページヘッダーと一覧ツールバー",
+    icon: LayoutList,
+    description: "パンくず、タイトル、主操作をページ上部に置き、一覧の検索と絞り込みをその下にまとめます。",
+    demo: <PageHeaderDemo />,
   },
 ];
 
