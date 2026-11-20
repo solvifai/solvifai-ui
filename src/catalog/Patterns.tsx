@@ -1,8 +1,10 @@
-import { Cloud, ListChecks, RotateCw, Search } from "lucide-react";
+import { CalendarRange, Cloud, ListChecks, RotateCw, Search, Upload } from "lucide-react";
 
 import { AutosaveDemo } from "./AutosaveDemo";
+import { DateFilterDemo } from "./DateFilterDemo";
 import { FileList } from "./FileList";
 import { LoadingRetryDemo } from "./LoadingRetryDemo";
+import { UploadDemo } from "./UploadDemo";
 
 export const patterns = [
   {
@@ -34,6 +36,21 @@ export const patterns = [
     icon: Cloud,
     description: "メモを書くと、入力が止まってからこのブラウザに自動保存されます。保存失敗と再試行も試せます。",
     demo: <AutosaveDemo />,
+  },
+  {
+    href: "#pattern-file-upload",
+    label: "複数ファイルのアップロード",
+    icon: Upload,
+    description:
+      "ファイルごとの進捗を表示し、失敗したファイルだけを再試行できます。ファイル名と模擬の送信結果を使うデモです。",
+    demo: <UploadDemo />,
+  },
+  {
+    href: "#pattern-date-filter",
+    label: "期間フィルター",
+    icon: CalendarRange,
+    description: "開始日と終了日を含む期間で一覧を絞り込みます。「期間を解除」で全件に戻ります。",
+    demo: <DateFilterDemo />,
   },
 ];
 
