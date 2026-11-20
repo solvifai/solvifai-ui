@@ -23,7 +23,12 @@ npm run dev
 - `src/ui/FileTypeIcon.tsx` にファイル形式の対応と画像の配信元を置きます。Officeなどの画像は [Microsoft Fluent UI CDN](https://github.com/microsoft/fluentui-system-icons/tree/main/packages/react-icons-file-type) を、PDF画像は [Google Drive](https://developers.google.com/workspace/drive/api/reference/rest/v3/files#File.FIELDS.icon_link) の配信元を参照します。
 - `src/catalog/guidelines.md` に人とAIで共有するUIルールを置きます。
 
-AppButton、TextInputとFormField、SearchInput、SelectBox、Checkbox、Badge、Dialog、LoadingSpinner、SimpleEmptyState、SimpleBreadcrumb、RowActionMenu、TablePagination、Table、FileChipList、AvatarGroup、SaveStatusIndicator、OptionGroup、Tabs、AppToaster、Tooltip、Radio、Toggle、Accordion、FileUpload、ProgressBar、SteppedForm、TextArea、DatePicker、DateTimePicker、ResizeDivider、AlertBanner、Skeleton、Drawer を収録しています。動作例は `src/ui/` の実装を直接使います。サンプルデータは架空です。[ファイル一覧サンプル](https://solvifai.github.io/solvifai-ui/#file-list) では、検索・行選択・三点メニュー・ページ送りをまとめて試せます。
+AppButton、TextInputとFormField、SearchInput、SelectBox、Checkbox、Badge、Dialog、LoadingSpinner、SimpleEmptyState、SimpleBreadcrumb、RowActionMenu、TablePagination、Table、FileChipList、AvatarGroup、SaveStatusIndicator、OptionGroup、Tabs、AppToaster、Tooltip、Radio、Toggle、Accordion、FileUpload、ProgressBar、SteppedForm、TextArea、DatePicker、DateTimePicker、ResizeDivider、AlertBanner、Skeleton、Drawer を収録しています。動作例は `src/ui/` の実装を直接使います。
+
+Patterns では、架空のファイル一覧で共通UIを組み合わせた操作を試せます。
+
+- [複数選択と一括削除](https://solvifai.github.io/solvifai-ui/#file-list) — ファイルを選び、ダイアログで件数と対象を確認してから削除します。
+- [検索結果が0件](https://solvifai.github.io/solvifai-ui/#pattern-search-empty) — 一致しない検索語から始まり、「検索をクリア」で一覧に戻れます。
 
 基準はSolvifAIの `main` にある `frontend/src/components/{common,form,shadcn}` と `frontend/tailwind.config.js` です。抽出時に参照先をローカルに置き換え、フォーカス、入力エラー、読み上げ、ダイアログの開閉を補い、小さな文字のコントラストを調整しています。SelectBox は Excel の複数表設定で使う `MultiTableOutputSelect` のドロップダウンを共通化したものです。現時点でnpm配布や製品への取り込みは行っていません。
 

@@ -1,6 +1,9 @@
+import type { Ref } from "react";
+
 import { SearchIcon } from "./icons";
 
 export interface SearchInputProps {
+  ref?: Ref<HTMLInputElement>;
   value: string;
   ariaLabel?: string;
   onChange: (value: string) => void;
@@ -9,6 +12,7 @@ export interface SearchInputProps {
 }
 
 export function SearchInput({
+  ref,
   value,
   ariaLabel = "検索",
   onChange,
@@ -19,6 +23,7 @@ export function SearchInput({
     <div className={`relative ${className}`}>
       <SearchIcon className="absolute top-1/2 left-3.5 -translate-y-1/2 text-text-muted" />
       <input
+        ref={ref}
         type="search"
         aria-label={ariaLabel}
         value={value}

@@ -1,4 +1,4 @@
-import { FolderOpen, X } from "lucide-react";
+import { ListChecks, Search, X } from "lucide-react";
 import { useRef, useState } from "react";
 
 import { AppButton } from "../ui/AppButton";
@@ -13,40 +13,71 @@ import { Table } from "../ui/Table";
 import { TablePagination } from "../ui/TablePagination";
 
 const sampleFiles = [
-  { id: 1, name: "月次レポート.xlsx", date: "2026-11-18", size: "324 KB" },
-  { id: 2, name: "顧客向け提案書.pptx", date: "2026-11-17", size: "2.4 MB" },
-  { id: 3, name: "プロジェクト計画書.docx", date: "2026-11-17", size: "186 KB" },
-  { id: 4, name: "定例会の議事録.pdf", date: "2026-11-16", size: "512 KB" },
-  { id: 5, name: "売上集計.csv", date: "2026-11-15", size: "48 KB" },
-  { id: 6, name: "予算レポート.xlsx", date: "2026-11-14", size: "246 KB" },
-  { id: 7, name: "新機能の説明資料.pptx", date: "2026-11-13", size: "1.8 MB" },
-  { id: 8, name: "運用チェックリスト.docx", date: "2026-11-13", size: "129 KB" },
-  { id: 9, name: "インタビュー議事録.pdf", date: "2026-11-12", size: "995 KB" },
-  { id: 10, name: "画面キャプチャ.png", date: "2026-11-11", size: "160 KB" },
-  { id: 11, name: "進捗レポート.xlsx", date: "2026-11-10", size: "208 KB" },
-  { id: 12, name: "作業メモ.txt", date: "2026-11-09", size: "8 KB" },
-  { id: 13, name: "リリース手順.pdf", date: "2026-11-08", size: "377 KB" },
+  { id: 1, name: "持ち物リスト.xlsx", date: "2026-11-18", size: "324 KB" },
+  { id: 2, name: "星座の紹介.pptx", date: "2026-11-17", size: "2.4 MB" },
+  { id: 3, name: "読書ノート.docx", date: "2026-11-17", size: "186 KB" },
+  { id: 4, name: "散歩マップ.pdf", date: "2026-11-16", size: "512 KB" },
+  { id: 5, name: "気温の記録.csv", date: "2026-11-15", size: "48 KB" },
+  { id: 6, name: "買い物リスト.xlsx", date: "2026-11-14", size: "246 KB" },
+  { id: 7, name: "写真アルバム.pptx", date: "2026-11-13", size: "1.8 MB" },
+  { id: 8, name: "旅の日記.docx", date: "2026-11-13", size: "129 KB" },
+  { id: 9, name: "お菓子のレシピ.pdf", date: "2026-11-12", size: "995 KB" },
+  { id: 10, name: "夕焼け.png", date: "2026-11-11", size: "160 KB" },
+  { id: 11, name: "植物の観察記録.xlsx", date: "2026-11-10", size: "208 KB" },
+  { id: 12, name: "観察メモ.txt", date: "2026-11-09", size: "8 KB" },
+  { id: 13, name: "工作の手順.pdf", date: "2026-11-08", size: "377 KB" },
+];
+
+export const fileListPatterns = [
+  {
+    href: "#file-list",
+    label: "複数選択と一括削除",
+    icon: ListChecks,
+    description:
+      "ファイルを複数選び、まとめて削除する前に対象を確認できます。選択は検索やページ送りをしても保持されます。",
+    initialQuery: "",
+  },
+  {
+    href: "#pattern-search-empty",
+    label: "検索結果が0件",
+    icon: Search,
+    description:
+      "一致するファイルがないときに、結果が0件であることと次にできる操作を表示します。検索をクリアすると一覧に戻ります。",
+    initialQuery: "見本にない名前",
+  },
 ];
 
 const pageSize = 5;
 const deleteActionStyle = "text-rose-700 hover:bg-rose-50 focus-visible:ring-rose-600";
 
-export function FileList() {
+export function FileList({
+  pattern: { label, icon: Icon, description, initialQuery },
+}: {
+  pattern: (typeof fileListPatterns)[number];
+}) {
   const [files, setFiles] = useState(sampleFiles);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [requestedPage, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState(() => new Set<number>());
   const [status, setStatus] = useState("");
-  const [pendingRemoval, setPendingRemoval] = useState<(typeof sampleFiles)[number] | null>(null);
+  const [pendingRemoval, setPendingRemoval] = useState<typeof sampleFiles | null>(null);
+  const searchInput = useRef<HTMLInputElement>(null);
   const listHeading = useRef<HTMLHeadingElement>(null);
   const returnFocus = useRef<HTMLElement | null>(null);
 
   const search = query.trim().toLowerCase();
   const matching = files.filter((file) => file.name.toLowerCase().includes(search));
+  const noMatches = search.length > 0 && files.length > 0 && matching.length === 0;
   const page = Math.min(requestedPage, Math.max(1, Math.ceil(matching.length / pageSize)));
   const visible = matching.slice((page - 1) * pageSize, page * pageSize);
   const selectedOnPage = visible.filter((file) => selectedIds.has(file.id)).length;
   const allOnPage = visible.length > 0 && selectedOnPage === visible.length;
+
+  function changeQuery(value: string) {
+    setQuery(value);
+    setPage(1);
+    setStatus("");
+  }
 
   function togglePage() {
     setSelectedIds((previous) => {
@@ -77,15 +108,16 @@ export function FileList() {
     }
   }
 
-  function removeFile() {
+  function removeFiles() {
     if (!pendingRemoval) return;
-    setFiles((previous) => previous.filter(({ id }) => id !== pendingRemoval.id));
-    setSelectedIds((previous) => {
-      const next = new Set(previous);
-      next.delete(pendingRemoval.id);
-      return next;
-    });
-    setStatus(`${pendingRemoval.name} を削除しました。`);
+    const removedIds = new Set(pendingRemoval.map(({ id }) => id));
+    setFiles((previous) => previous.filter(({ id }) => !removedIds.has(id)));
+    setSelectedIds((previous) => new Set([...previous].filter((id) => !removedIds.has(id))));
+    setStatus(
+      pendingRemoval.length === 1
+        ? `${pendingRemoval[0].name} を削除しました。`
+        : `${pendingRemoval.length}件のファイルを削除しました。`,
+    );
     setPendingRemoval(null);
   }
 
@@ -93,12 +125,10 @@ export function FileList() {
     <div className="document-page">
       <header className="document-heading">
         <span className="document-kicker">
-          <FolderOpen size={18} aria-hidden="true" /> サンプル
+          <Icon size={18} aria-hidden="true" /> Patterns
         </span>
-        <h1>ファイル一覧</h1>
-        <p>
-          ファイル名や拡張子で検索し、行を選択できます。右端の三点メニューからファイル名のコピーや削除を試せます。
-        </p>
+        <h1>{label}</h1>
+        <p>{description}</p>
       </header>
       <section
         className="mt-2 rounded-xl border border-catalog-line bg-white"
@@ -112,18 +142,15 @@ export function FileList() {
               tabIndex={-1}
               className="text-base font-bold"
             >
-              資料
+              ファイル一覧
             </h2>
             <p className="mt-1 text-xs text-catalog-muted">サンプルデータ</p>
           </div>
           <SearchInput
+            ref={searchInput}
             className="w-full sm:w-64"
             value={query}
-            onChange={(value) => {
-              setQuery(value);
-              setPage(1);
-              setStatus("");
-            }}
+            onChange={changeQuery}
             ariaLabel="ファイルを検索"
             placeholder="ファイル名・拡張子で検索"
           />
@@ -131,14 +158,29 @@ export function FileList() {
         <div className="flex min-h-10 flex-wrap items-center gap-x-3 gap-y-1 px-4 pb-2 text-xs text-catalog-muted sm:px-5">
           <span role="status">{selectedIds.size}件選択</span>
           {selectedIds.size > 0 ? (
-            <button
-              type="button"
-              className="inline-flex items-center gap-1 rounded px-2 py-1 font-semibold text-catalog-blue hover:bg-blue-50"
-              onClick={() => setSelectedIds(new Set<number>())}
-            >
-              <X size={14} aria-hidden="true" /> 選択を解除
-            </button>
+            <>
+              <AppButton
+                variant="back"
+                className="!h-8 !text-rose-700"
+                onClick={(event) => {
+                  returnFocus.current = event.currentTarget;
+                  setPendingRemoval(files.filter(({ id }) => selectedIds.has(id)));
+                }}
+              >
+                選択したファイルを削除
+              </AppButton>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 rounded px-2 py-1 font-semibold text-catalog-blue hover:bg-blue-50"
+                onClick={() => setSelectedIds(new Set<number>())}
+              >
+                <X size={14} aria-hidden="true" /> 選択を解除
+              </button>
+            </>
           ) : null}
+          <span className="ml-auto">
+            {search && files.length > 0 ? `検索結果 ${matching.length}件` : ""}
+          </span>
         </div>
         <div className="border-y border-catalog-line">
           <Table
@@ -220,7 +262,7 @@ export function FileList() {
                                 document.activeElement instanceof HTMLElement
                                   ? document.activeElement
                                   : null;
-                              setPendingRemoval(file);
+                              setPendingRemoval([file]);
                             },
                           },
                         ]}
@@ -233,9 +275,22 @@ export function FileList() {
                 <tr>
                   <td colSpan={5}>
                     <SimpleEmptyState
-                      message={search ? "一致するファイルがありません" : "ファイルがありません"}
-                      subMessage={search ? "別のファイル名や拡張子で検索してください。" : undefined}
+                      message={noMatches ? "一致するファイルがありません" : "ファイルがありません"}
+                      subMessage={noMatches ? "別のファイル名や拡張子で検索してください。" : undefined}
+                      className={noMatches ? "!pb-3" : undefined}
                     />
+                    {noMatches ? (
+                      <div className="pb-8 text-center">
+                        <AppButton
+                          onClick={() => {
+                            changeQuery("");
+                            searchInput.current?.focus();
+                          }}
+                        >
+                          検索をクリア
+                        </AppButton>
+                      </div>
+                    ) : null}
                   </td>
                 </tr>
               ) : null}
@@ -262,6 +317,12 @@ export function FileList() {
         <a className="source-link" href="#table-pagination">
           ページ送りの使い方
         </a>
+        <a className="source-link" href="#search-input">
+          検索欄の使い方
+        </a>
+        <a className="source-link" href="#empty-state">
+          空の状態の使い方
+        </a>
       </div>
       <Dialog
         open={pendingRemoval !== null}
@@ -277,13 +338,20 @@ export function FileList() {
             returnFocus.current = null;
           }}
         >
-          <DialogTitle className="pr-8">ファイルを削除しますか？</DialogTitle>
+          <DialogTitle className="pr-8">
+            {pendingRemoval?.length === 1
+              ? "ファイルを削除しますか？"
+              : `${pendingRemoval?.length}件のファイルを削除しますか？`}
+          </DialogTitle>
           <DialogDescription>
-            {pendingRemoval?.name} をこのサンプルの一覧から削除します。
+            以下のファイルをデモの一覧から削除します。
           </DialogDescription>
+          <ul className="max-h-36 list-disc overflow-y-auto pl-5 text-sm text-text-primary">
+            {pendingRemoval?.map((file) => <li key={file.id}>{file.name}</li>)}
+          </ul>
           <DialogFooter>
             <AppButton onClick={() => setPendingRemoval(null)}>キャンセル</AppButton>
-            <AppButton variant="primary" className="!bg-rose-700 !bg-none" onClick={removeFile}>
+            <AppButton variant="primary" className="!bg-rose-700 !bg-none" onClick={removeFiles}>
               削除する
             </AppButton>
           </DialogFooter>

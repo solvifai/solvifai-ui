@@ -9,7 +9,6 @@ import {
   Command,
   Copy,
   Github,
-  FolderOpen,
   LayoutGrid,
   Menu,
   Palette,
@@ -22,7 +21,7 @@ import { SearchInput } from "../ui/SearchInput";
 import { SimpleEmptyState } from "../ui/EmptyState";
 import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
 import { categories, components, type Category, type ComponentEntry } from "./components";
-import { FileList } from "./FileList";
+import { FileList, fileListPatterns } from "./FileList";
 import guide from "./guidelines.md?raw";
 import guideUrl from "./guidelines.md?url&no-inline";
 import { brandSymbolUrl, Icons } from "./Icons";
@@ -40,7 +39,6 @@ const categoryLinks = {
 
 const links = [
   { href: "#components", label: "コンポーネント", icon: LayoutGrid },
-  { href: "#file-list", label: "ファイル一覧サンプル", icon: FolderOpen },
   { href: "#tokens", label: "デザイントークン", icon: Palette },
   { href: "#icons", label: "SolvifAIアイコン", icon: Shapes },
   { href: "#guidelines", label: "UIガイド", icon: BookOpen },
@@ -63,6 +61,18 @@ function Sidebar({ hash, isOpen, close }: { hash: string; isOpen: boolean; close
             onClick={close}
           >
             <Icon size={17} aria-hidden="true" />
+            {label}
+          </a>
+        ))}
+        <div className="sidebar-label">Patterns</div>
+        {fileListPatterns.map(({ href, label, icon: Icon }) => (
+          <a
+            key={href}
+            href={href}
+            aria-current={hash === href ? "page" : undefined}
+            onClick={close}
+          >
+            <Icon size={16} aria-hidden="true" />
             {label}
           </a>
         ))}
@@ -268,7 +278,7 @@ function Detail({ entry }: { entry: ComponentEntry }) {
       {entry.id === "table" ? (
         <div>
           <a className="source-link" href="#file-list">
-            ファイル一覧サンプルで試す
+            複数選択と一括削除を試す
             <ArrowUpRight size={15} aria-hidden="true" />
           </a>
         </div>
@@ -387,9 +397,13 @@ export function App() {
   const [hash, setHash] = useState(() => window.location.hash || "#components");
   const [mobileOpen, setMobileOpen] = useState(false);
   const entry = components.find(({ id }) => "#" + id === hash);
+  const pattern = fileListPatterns.find(({ href }) => href === hash);
   const category = categories.find((item) => categoryLinks[item] === hash) ?? "すべて";
   const title =
-    entry?.label ?? links.find((link) => link.href === hash && hash !== "#components")?.label ?? "";
+    entry?.label ??
+    pattern?.label ??
+    links.find((link) => link.href === hash && hash !== "#components")?.label ??
+    "";
 
   useEffect(() => {
     const onHash = () => {
@@ -412,7 +426,7 @@ export function App() {
 
   let content = <Catalog category={category} />;
   if (entry) content = <Detail key={entry.id} entry={entry} />;
-  if (hash === "#file-list") content = <FileList />;
+  if (pattern) content = <FileList key={pattern.href} pattern={pattern} />;
   if (hash === "#tokens") content = <Tokens />;
   if (hash === "#guidelines") content = <Guidelines />;
   if (hash === "#icons") content = <Icons sourceBase={repository + "/blob/main/src/ui"} />;
