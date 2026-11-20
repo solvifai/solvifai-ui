@@ -35,6 +35,6 @@ Radio は本体のフォルダ分類、Toggle は手引きパネルの高精度�
 
 FileUpload はフォーマット作成時のPPTXアップロード、ProgressBar はスライド生成時の進捗表示、SteppedForm は成果物作成フォームがベースです。
 
-TextArea と DatePicker はプロジェクト編集の概要・期間入力、DateTimePicker はログ管理の分単位の日時入力、ResizeDivider はフォーマット編集画面のパネル幅調整がベースです。
+TextArea と DatePicker はプロジェクト編集の概要・期間入力、DateTimePicker はログ管理の分単位の日時入力、ResizeDivider はフォーマット編集画面のパネル幅調整がベースです。DatePicker と DateTimePicker は共通のカレンダーを使い、DateTimePicker は時刻を指定してから確定します。
 
 AlertBanner はプロジェクト編集の再取得エラー、Skeleton は一括編集の修正案作成中表示、Drawer は成果物編集のバージョン履歴を開く右サイドパネルがベースです。

@@ -687,13 +687,13 @@ import { TextArea } from "./ui/TextArea";
     label: "日付ピッカー",
     category: "入力",
     icon: CalendarDays,
-    description: "プロジェクト期間などの日付を、ブラウザのカレンダーまたはキーボードで指定します。",
+    description: "プロジェクト期間などの日付を、月ごとのカレンダーから選びます。",
     guidance: [
       "ラベルで「開始日」「終了日」のように、指定する対象を示します。",
-      "値は YYYY-MM-DD 形式です。終了日には開始日を min として渡せます。",
-      "カレンダーの見た目と入力順は、ブラウザや端末の設定に従います。",
+      "値は YYYY-MM-DD 形式です。min と max で選べる範囲を指定します。",
+      "矢印キーで日を移動し、Enter で選択します。Page Up / Down で月、Shift と併用すると年を移動します。",
     ],
-    variants: ["日付入力", "開始日と終了日", "範囲エラー"],
+    variants: ["カレンダー", "選択範囲", "キーボード操作"],
     file: "DatePicker.tsx",
     code: `import { DatePicker } from "./ui/DatePicker";
 
@@ -701,7 +701,7 @@ import { TextArea } from "./ui/TextArea";
   aria-label="終了日"
   min={startDate || undefined}
   value={endDate}
-  onChange={(event) => setEndDate(event.currentTarget.value)}
+  onChange={setEndDate}
 />`,
   },
   {
@@ -710,21 +710,22 @@ import { TextArea } from "./ui/TextArea";
     label: "日時ピッカー",
     category: "入力",
     icon: CalendarClock,
-    description: "ログ管理のように、日付と時刻を分単位で指定します。",
+    description: "ログ管理などの開始・終了日時を、カレンダーと24時間制の時刻欄で指定します。",
     guidance: [
       "期間を指定するときは「開始日時」と「終了日時」のラベルを付けます。",
-      "分単位の値は YYYY-MM-DDTHH:mm 形式です。min と max も同じ形式で渡します。",
-      "値にタイムゾーンは含まれません。ログ管理のように日本時間で扱う場合は、入力の近くに明記し、送信時に変換します。",
+      "日付と時刻を指定して「適用」で確定します。値と min / max は YYYY-MM-DDTHH:mm 形式です。",
+      "timeZone に Asia/Tokyo を渡すと「今日」が日本時間に従います。値のタイムゾーン変換は送信側で行い、入力の近くに使用するタイムゾーンを示します。",
     ],
-    variants: ["日時入力", "開始日時と終了日時", "範囲エラー"],
+    variants: ["24時間表示", "分単位", "範囲エラー"],
     file: "DatePicker.tsx",
     code: `import { DateTimePicker } from "./ui/DatePicker";
 
 <DateTimePicker
   aria-label="終了日時（日本時間）"
+  timeZone="Asia/Tokyo"
   min={startAt || undefined}
   value={endAt}
-  onChange={(event) => setEndAt(event.currentTarget.value)}
+  onChange={setEndAt}
 />`,
   },
   {

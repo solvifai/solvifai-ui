@@ -875,90 +875,63 @@ function TextAreaPreview() {
   );
 }
 
-function DatePickerPreview() {
-  const [start, setStart] = useState("2026-11-01");
-  const [end, setEnd] = useState("");
+function DateRangePickerPreview({ kind }: { kind: "date" | "datetime" }) {
+  const withTime = kind === "datetime";
+  const Picker = withTime ? DateTimePicker : DatePicker;
+  const [start, setStart] = useState(withTime ? "2026-11-19T09:00" : "2026-11-01");
+  const [end, setEnd] = useState(withTime ? "2026-11-19T18:00" : "");
   const id = useId();
-  const invalid = Boolean(start && end && Date.parse(end) < Date.parse(start));
-
-  return (
-    <div className="grid w-full max-w-md gap-3 sm:grid-cols-2">
-      <FormField label="開始日" htmlFor={id + "-start"}>
-        <DatePicker
-          id={id + "-start"}
-          value={start}
-          onChange={(event) => setStart(event.currentTarget.value)}
-        />
-      </FormField>
-      <FormField label="終了日" htmlFor={id + "-end"}>
-        <DatePicker
-          id={id + "-end"}
-          min={start || undefined}
-          value={end}
-          onChange={(event) => setEnd(event.currentTarget.value)}
-          aria-invalid={invalid || undefined}
-          aria-describedby={invalid ? id + "-error" : undefined}
-        />
-        {invalid ? (
-          <p id={id + "-error"} className="demo-error">
-            終了日は開始日以降を選んでください。
-          </p>
-        ) : null}
-      </FormField>
-    </div>
-  );
-}
-
-function DateTimePickerPreview() {
-  const id = useId();
-  const zoneId = id + "-zone";
+  const unit = withTime ? "日時" : "日";
+  const zoneId = withTime ? id + "-zone" : undefined;
   const errorId = id + "-error";
-  const [start, setStart] = useState({
-    value: "2026-11-19T09:00",
-    valueAsNumber: Date.UTC(2026, 10, 19, 9),
-  });
-  const [end, setEnd] = useState({
-    value: "2026-11-19T18:00",
-    valueAsNumber: Date.UTC(2026, 10, 19, 18),
-  });
-  const invalid = end.valueAsNumber < start.valueAsNumber;
+  const invalid = Boolean(start && end && end < start);
+  const endDescription = [zoneId, invalid ? errorId : undefined].filter(Boolean).join(" ");
+  const timeZone = withTime ? "Asia/Tokyo" : undefined;
 
   return (
     <div className="grid w-full max-w-lg gap-3">
-      <p id={zoneId} className="text-xs text-catalog-muted">
-        日本時間（JST）
-      </p>
+      {zoneId ? (
+        <p id={zoneId} className="text-xs text-catalog-muted">
+          日本時間（JST）
+        </p>
+      ) : null}
       <div className="grid gap-3 sm:grid-cols-2">
-        <FormField label="開始日時" htmlFor={id + "-start"}>
-          <DateTimePicker
+        <FormField label={"開始" + unit} htmlFor={id + "-start"}>
+          <Picker
             id={id + "-start"}
-            value={start.value}
+            value={start}
             aria-describedby={zoneId}
-            onChange={({ currentTarget: { value, valueAsNumber } }) =>
-              setStart({ value, valueAsNumber })
-            }
+            timeZone={timeZone}
+            onChange={setStart}
           />
         </FormField>
-        <FormField label="終了日時" htmlFor={id + "-end"}>
-          <DateTimePicker
+        <FormField label={"終了" + unit} htmlFor={id + "-end"}>
+          <Picker
             id={id + "-end"}
-            min={start.value || undefined}
-            value={end.value}
+            min={start || undefined}
+            value={end}
             aria-invalid={invalid || undefined}
-            aria-describedby={invalid ? zoneId + " " + errorId : zoneId}
-            onChange={({ currentTarget: { value, valueAsNumber } }) =>
-              setEnd({ value, valueAsNumber })
-            }
+            aria-describedby={endDescription || undefined}
+            timeZone={timeZone}
+            onChange={setEnd}
           />
           {invalid ? (
             <p id={errorId} className="demo-error">
-              終了日時は開始日時以降を選んでください。
+              終了{unit}は開始{unit}以降を選んでください。
             </p>
           ) : null}
         </FormField>
       </div>
     </div>
   );
+}
+
+function DatePickerPreview() {
+  return <DateRangePickerPreview kind="date" />;
+}
+
+function DateTimePickerPreview() {
+  return <DateRangePickerPreview kind="datetime" />;
 }
 
 function ResizePanelPreview() {
