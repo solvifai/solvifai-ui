@@ -1,8 +1,9 @@
-import { Bell, CalendarRange, Cloud, ListChecks, PanelLeft, RotateCw, Search, Upload } from "lucide-react";
+import { Bell, CalendarRange, Cloud, ListChecks, PanelLeft, PanelTop, RotateCw, Search, Upload } from "lucide-react";
 
 import { AutosaveDemo } from "./AutosaveDemo";
 import { DateFilterDemo } from "./DateFilterDemo";
 import { FileList } from "./FileList";
+import { HeaderDemo } from "./HeaderDemo";
 import { LoadingRetryDemo } from "./LoadingRetryDemo";
 import { NotificationDemo } from "./NotificationDemo";
 import { SideNavDemo } from "./SideNavDemo";
@@ -43,7 +44,12 @@ export const patterns = [
     source: "routes/settings/log-info.tsx", demo: <DateFilterDemo />,
   },
   {
-    href: "#pattern-app-header", label: "通知ドロップダウン", icon: Bell,
+    href: "#pattern-app-header", label: "共通ヘッダー", icon: PanelTop,
+    description: "ロゴ、プロジェクト切り替え、メンバー、通知を備えた本体のヘッダーです。",
+    source: "components/layout/Header.tsx", demo: <HeaderDemo />,
+  },
+  {
+    href: "#pattern-notification", label: "通知ドロップダウン", icon: Bell,
     description: "通知ボタンで未読件数を確認し、一覧を開いて既読にできます。",
     source: "components/layout/NotificationDropdown.tsx", demo: <NotificationDemo />,
   },

@@ -28,4 +28,5 @@ npm run dev
 - [複数選択と一括削除](https://solvifai.github.io/solvifai-ui/#file-list)、[検索結果が0件](https://solvifai.github.io/solvifai-ui/#pattern-search-empty)、[読み込み失敗と再読み込み](https://solvifai.github.io/solvifai-ui/#pattern-loading-retry)、[複数ファイル追加](https://solvifai.github.io/solvifai-ui/#pattern-file-upload) は本体の資料一覧の操作を切り出したものです。
 - [自動保存](https://solvifai.github.io/solvifai-ui/#pattern-autosave) は編集後に保存を待ち、保存処理を直列化する流れを、ブラウザ内に保存するメモで示します。
 - [日時フィルター](https://solvifai.github.io/solvifai-ui/#pattern-date-filter) は開始・終了を入力し、逆転時にもう一方を1分ずらす操作を示します。
-- [通知ドロップダウン](https://solvifai.github.io/solvifai-ui/#pattern-app-header) と [折りたためるサイドナビ](https://solvifai.github.io/solvifai-ui/#pattern-side-nav) は本体のナビゲーションから該当操作を切り出したものです。
+- [共通ヘッダー](https://solvifai.github.io/solvifai-ui/#pattern-app-header) は本体のロゴ、プロジェクト切り替え、メンバー、通知を切り出したものです。
+- [通知ドロップダウン](https://solvifai.github.io/solvifai-ui/#pattern-notification) と [折りたためるサイドナビ](https://solvifai.github.io/solvifai-ui/#pattern-side-nav) は本体のナビゲーションから該当操作を切り出したものです。
