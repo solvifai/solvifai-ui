@@ -1,112 +1,96 @@
-import { useState } from "react";
+import { FileCode, FileText, type LucideIcon } from 'lucide-react';
 
-import { cn } from "./cn";
-import { FileIcon } from "./icons";
+import { cn } from './cn';
 
-const fluentAssets = "https://res.cdn.office.net/files/fabric-cdn-prod_20260623.001/assets/";
+const FILE_ICONS: Record<string, { icon: string; label: string }> = {};
 
-const genericFileSrc = fluentAssets + "item-types/48/genericfile.png";
+const types = [
+  ['ppt pptm pptx', 'pptx', 'PowerPoint'],
+  ['doc docm docx', 'docx', 'Word'],
+  ['xls xlsb xlsm xlsx', 'xlsx', 'Excel'],
+  ['pdf', 'pdf', 'PDF'],
+  ['txt', 'txt', 'テキスト'],
+  ['csv', 'csv', 'CSV'],
+  ['jpg jpeg png gif webp bmp tif tiff heic', 'photo', '画像'],
+  ['wav mp3 m4a opus ogg flac wma aac amr spx', 'audio', '音声'],
+  ['mp4 webm mov avi wmv', 'video', '動画'],
+] as const;
 
-interface FileType {
-  label: string;
-  extensions: string[];
-  src: string;
+export const fileTypes = types.map(([extensions, , label]) => ({ label, extensions: extensions.split(' ') }));
+
+for (const [extensions, icon, label] of types) {
+  for (const extension of extensions.split(' ')) {
+    FILE_ICONS[extension] = { icon, label };
+  }
 }
 
-export const fileTypes: readonly FileType[] = [
-  {
-    label: "Word",
-    extensions: ["docx", "doc", "docm"],
-    src: fluentAssets + "brand-icons/product/png/word_48x1.png",
-  },
-  {
-    label: "Excel",
-    extensions: ["xlsx", "xls", "xlsm", "xlsb"],
-    src: fluentAssets + "brand-icons/product/png/excel_48x1.png",
-  },
-  {
-    label: "PowerPoint",
-    extensions: ["pptx", "ppt", "pptm"],
-    src: fluentAssets + "brand-icons/product/png/powerpoint_48x1.png",
-  },
-  {
-    label: "PDF",
-    extensions: ["pdf"],
-    src: "https://drive-thirdparty.googleusercontent.com/64/type/application/pdf",
-  },
-  { label: "CSV", extensions: ["csv"], src: fluentAssets + "item-types/48/csv.png" },
-  { label: "テキスト", extensions: ["txt"], src: fluentAssets + "item-types/48/txt.png" },
-  {
-    label: "画像",
-    extensions: ["png", "jpg", "jpeg", "gif", "webp", "bmp", "tif", "tiff", "heic"],
-    src: fluentAssets + "item-types/48/photo.png",
-  },
-  {
-    label: "音声",
-    extensions: ["mp3", "wav", "m4a", "opus", "ogg", "flac", "wma", "aac", "amr", "spx"],
-    src: fluentAssets + "item-types/48/audio.png",
-  },
-  {
-    label: "動画",
-    extensions: ["mp4", "webm", "mov", "avi", "wmv"],
-    src: fluentAssets + "item-types/48/video.png",
-  },
-  {
-    label: "その他のファイル",
-    extensions: [],
-    src: genericFileSrc,
-  },
-];
-
-const fileTypeByExtension = new Map(
-  fileTypes.flatMap((type) => type.extensions.map((extension) => [extension, type] as const)),
-);
+const EXTRA_FILE_ICONS: Partial<
+  Record<string, { Icon: LucideIcon; label: string; color: string }>
+> = {
+  md: { Icon: FileText, label: 'Markdown', color: 'text-violet-700' },
+  c: { Icon: FileCode, label: 'Cソースコード', color: 'text-blue-700' },
+};
 
 interface FileTypeIconProps {
   extension?: string | null;
   fileName?: string;
   className?: string;
   nativeTooltip?: boolean;
+  showExtension?: boolean;
 }
 
-/** Mirrors the file-format mapping used in the SolvifAI file list. */
+/** Microsoft / Google の公式 PNG。取得元は public/assets/file-types/README.md。 */
 export function FileTypeIcon({
   extension,
   fileName,
   className,
   nativeTooltip = true,
+  showExtension = false,
 }: FileTypeIconProps) {
-  const [failedSrc, setFailedSrc] = useState<string>();
   const ext = (
-    extension?.trim().replace(/^\./, "") ||
-    (fileName?.includes(".") ? fileName.split(".").pop() : "") ||
-    ""
+    extension?.trim().replace(/^\./, '') ||
+    (fileName?.includes('.') ? fileName.split('.').pop() : '') ||
+    ''
   ).toLowerCase();
-  const fileType = fileTypeByExtension.get(ext);
-  const label = ext ? `${fileType?.label ?? "ファイル"} (.${ext})` : "ファイル";
-  const src = fileType?.src ?? genericFileSrc;
-  const title = nativeTooltip ? label : undefined;
-  const classes = cn("size-6 shrink-0 object-contain", className);
-
-  if (failedSrc === src) {
-    return (
-      <span role="img" aria-label={label} title={title} className={classes}>
-        <FileIcon className="size-full" />
-      </span>
-    );
-  }
-
-  return (
+  const fileIcon = FILE_ICONS[ext];
+  const badge = showExtension && /^[a-z0-9]{1,5}$/.test(ext);
+  const extra = badge ? EXTRA_FILE_ICONS[ext] : undefined;
+  const kind = extra?.label ?? fileIcon?.label ?? 'ファイル';
+  const label = ext ? `${kind} (.${ext})` : kind;
+  const image = (
     <img
-      src={src}
-      alt={label}
-      title={title}
+      src={`${import.meta.env.BASE_URL}assets/file-types/${fileIcon?.icon ?? 'genericfile'}.png`}
+      alt={badge ? '' : label}
+      title={!badge && nativeTooltip ? label : undefined}
       width={24}
       height={24}
-      className={classes}
+      className={cn('size-6 shrink-0 object-contain', className)}
       draggable={false}
-      referrerPolicy="no-referrer"
-      onError={() => setFailedSrc(src)}
     />
+  );
+  if (!badge) return image;
+
+  return (
+    <span
+      role='img'
+      aria-label={label}
+      title={nativeTooltip ? label : undefined}
+      className='relative flex h-8 w-9 shrink-0 items-start justify-center'
+    >
+      {extra ? (
+        <extra.Icon
+          aria-hidden='true'
+          className={cn('size-6', extra.color, className)}
+        />
+      ) : (
+        image
+      )}
+      <span
+        aria-hidden='true'
+        className='absolute bottom-0 rounded border border-white bg-slate-700 px-1 text-[9px] leading-[13px] font-bold text-white'
+      >
+        {ext.toUpperCase()}
+      </span>
+    </span>
   );
 }

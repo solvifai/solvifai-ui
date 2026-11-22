@@ -17,9 +17,6 @@ export interface SelectBoxProps {
   name?: string;
   placeholder?: string;
   disabled?: boolean;
-  required?: boolean;
-  invalid?: boolean;
-  describedBy?: string;
   className?: string;
 }
 
@@ -31,9 +28,6 @@ export function SelectBox({
   name,
   placeholder = "選択してください",
   disabled = false,
-  required = false,
-  invalid = false,
-  describedBy,
   className,
 }: SelectBoxProps) {
   const [open, setOpen] = useState(false);
@@ -141,9 +135,6 @@ export function SelectBox({
         aria-expanded={expanded}
         aria-controls={expanded ? listboxId : undefined}
         aria-activedescendant={expanded ? `${listboxId}-${activeIndex}` : undefined}
-        aria-required={required || undefined}
-        aria-invalid={invalid || undefined}
-        aria-describedby={describedBy}
         disabled={isDisabled}
         onClick={() => {
           setHighlightedIndex(initialIndex);
@@ -151,7 +142,7 @@ export function SelectBox({
         }}
         onKeyDown={handleKeyDown}
         className={cn(
-          "flex min-h-10 w-full items-center justify-between gap-2 rounded-lg border border-border-control bg-white px-3 py-2 text-left text-sm text-text-primary transition-colors enabled:hover:border-brand-primary aria-expanded:border-brand-primary aria-invalid:border-rose-500 aria-invalid:focus-visible:outline-rose-500 disabled:cursor-not-allowed disabled:bg-product-bg disabled:text-text-muted",
+          "flex w-full items-center justify-between gap-2 rounded-lg border border-border-control bg-white px-3 py-2 text-left text-sm text-text-primary transition-colors hover:border-brand-primary focus-visible:ring-2 focus-visible:ring-brand-primary/30 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400",
           className,
         )}
       >
@@ -160,7 +151,7 @@ export function SelectBox({
         </span>
         <ChevronDownIcon
           className={cn(
-            "size-4 shrink-0 text-text-muted motion-safe:transition-transform",
+            "size-4 shrink-0 text-text-secondary motion-safe:transition-transform",
             expanded && "rotate-180",
           )}
         />

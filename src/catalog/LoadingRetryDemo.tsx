@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
-import { AlertBanner } from "../ui/AlertBanner";
+import { QueryError } from "../ui/QueryError";
 import { AppButton } from "../ui/AppButton";
-import { Skeleton } from "../ui/Skeleton";
+import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { FileList } from "./FileList";
 
 type LoadState = "loading" | "failed" | "retrying" | "ready";
@@ -40,24 +40,13 @@ export function LoadingRetryDemo() {
           )}
         </div>
         {(state === "loading" || state === "retrying") && (
-          <Skeleton label={state === "retrying" ? "もう一度読み込んでいます…" : "一覧を読み込んでいます…"} />
+          <LoadingSpinner className="py-12" message={state === "retrying" ? "再読み込み中…" : "読み込み中…"} />
         )}
         {state === "failed" && (
-          <AlertBanner
-            action={
-              <AppButton
-                variant="back"
-                onClick={() => {
-                  setState("retrying");
-                  heading.current?.focus();
-                }}
-              >
-                再試行
-              </AppButton>
-            }
-          >
-            ファイル一覧を読み込めませんでした。
-          </AlertBanner>
+          <QueryError error={new Error("サンプル一覧を取得できませんでした。")} retry={() => {
+            setState("retrying");
+            heading.current?.focus();
+          }} />
         )}
         <p role="status" className={state === "ready" ? "text-sm text-catalog-muted" : "sr-only"}>
           {state === "ready" ? "一覧を読み込みました。" : ""}
@@ -65,7 +54,7 @@ export function LoadingRetryDemo() {
       </section>
       {state === "ready" && <FileList />}
       <div className="mt-4 flex flex-wrap gap-x-5">
-        <a className="source-link" href="#skeleton">読み込み表示の使い方</a>
+        <a className="source-link" href="#loading-spinner">読み込み表示の使い方</a>
         <a className="source-link" href="#alert-banner">エラー表示の使い方</a>
       </div>
     </>

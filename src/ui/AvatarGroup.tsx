@@ -1,85 +1,145 @@
-import { useState } from "react";
-
-import { IconUserDefault } from "./sidebar-icons";
+import { useMemo } from 'react';
 
 export interface AvatarGroupMember {
   id?: number;
   name: string;
-  icon_path?: string | null;
+  icon_path: string;
 }
 
-export interface AvatarGroupProps {
+interface AvatarGroupProps {
   members: readonly AvatarGroupMember[];
   maxVisible?: number;
   currentUserId?: number;
 }
 
+const avatarConfig = {
+  px: 28,
+  overlap: '-ml-[8px]',
+  border: 'border-[1.5px]',
+  iconSize: 14,
+};
+
 function Avatar({
-  member,
+  name,
+  iconPath,
   index,
   totalVisible,
 }: {
-  member: AvatarGroupMember;
+  name: string;
+  iconPath: string;
   index: number;
   totalVisible: number;
 }) {
-  const [failedSrc, setFailedSrc] = useState<string>();
-  const src = member.icon_path;
-  const hasImage = src && src !== "/img/icon/user.svg" && src !== failedSrc;
+  const isDefault = iconPath === '/img/icon/user.svg';
 
   return (
-    <span
-      className={`flex size-7 shrink-0 overflow-hidden rounded-full border-[1.5px] border-white bg-border-secondary ${index > 0 ? "-ml-2" : ""}`}
-      style={{ zIndex: totalVisible - index }}
-      title={member.name}
+    <div
+      className={`shrink-0 overflow-hidden rounded-full bg-border-secondary ${avatarConfig.border} border-solid border-white ${index > 0 ? avatarConfig.overlap : ''}`}
+      style={{
+        width: avatarConfig.px,
+        height: avatarConfig.px,
+        zIndex: totalVisible - index,
+      }}
+      title={name}
     >
-      {hasImage ? (
+      {!isDefault ? (
         <img
-          src={src}
-          alt={member.name}
-          className="size-full object-cover"
-          onError={() => setFailedSrc(src)}
+          src={iconPath}
+          alt={name}
+          className='h-full w-full object-cover'
         />
       ) : (
-        <span role="img" aria-label={member.name} className="size-full">
-          <IconUserDefault className="size-full" />
-        </span>
+        <div className='flex h-full w-full items-center justify-center'>
+          <svg
+            width={avatarConfig.iconSize}
+            height={avatarConfig.iconSize}
+            viewBox='0 0 16 16'
+            fill='none'
+            xmlns='http://www.w3.org/2000/svg'
+          >
+            <path
+              d='M5.3 4.7a2.7 2.7 0 1 0 5.4 0 2.7 2.7 0 0 0-5.4 0Z'
+              stroke='#fff'
+              strokeWidth='1.2'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            />
+            <path
+              d='M4 14v-1.3A2.7 2.7 0 0 1 6.7 10h2.6a2.7 2.7 0 0 1 2.7 2.7V14'
+              stroke='#fff'
+              strokeWidth='1.2'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            />
+          </svg>
+        </div>
       )}
-    </span>
+    </div>
   );
 }
 
-export function AvatarGroup({ members, maxVisible = 5, currentUserId }: AvatarGroupProps) {
+export function AvatarGroup({
+  members,
+  maxVisible = 5,
+  currentUserId,
+}: AvatarGroupProps) {
+  // currentUserId が指定されている場合、自分を最後に移動しつつ必ず表示枠内に入れる
+  const sortedMembers = useMemo(() => {
+    if (currentUserId === undefined) return members;
+    const currentIndex = members.findIndex((m) => m.id === currentUserId);
+    if (currentIndex === -1) return members;
+    const others = members.filter((_, i) => i !== currentIndex);
+    return [...others, members[currentIndex]];
+  }, [members, currentUserId]);
+
+  const visibleMembers = useMemo(() => {
+    const sliced = sortedMembers.slice(0, maxVisible);
+    // 自分が overflow に落ちている場合、最後の visible スロットと交換
+    if (
+      currentUserId !== undefined &&
+      sortedMembers.length > maxVisible &&
+      !sliced.some((m) => m.id === currentUserId)
+    ) {
+      const currentMember = sortedMembers.find((m) => m.id === currentUserId);
+      if (currentMember) {
+        return [...sliced.slice(0, maxVisible - 1), currentMember];
+      }
+    }
+    return sliced;
+  }, [sortedMembers, maxVisible, currentUserId]);
+
+  const remainingCount = Math.max(0, sortedMembers.length - maxVisible);
+  const remainingNames = useMemo(
+    () =>
+      sortedMembers
+        .slice(maxVisible)
+        .filter((m) => m.id !== currentUserId)
+        .map((m) => m.name)
+        .join(', '),
+    [sortedMembers, maxVisible, currentUserId],
+  );
+
   if (members.length === 0) return null;
 
-  const count = Math.max(0, Math.trunc(maxVisible));
-  const current =
-    currentUserId === undefined ? undefined : members.find(({ id }) => id === currentUserId);
-  const visible =
-    current && count > 0
-      ? [...members.filter((member) => member !== current).slice(0, count - 1), current]
-      : members.slice(0, count);
-  const remaining = members.filter((member) => !visible.includes(member));
-
   return (
-    <div className="flex items-center">
-      {visible.map((member, index) => (
+    <div className='flex items-center'>
+      {visibleMembers.map((member, index) => (
         <Avatar
-          key={member.id ?? `${member.name}-${index}`}
-          member={member}
+          key={index}
+          name={member.name}
+          iconPath={member.icon_path}
           index={index}
-          totalVisible={visible.length}
+          totalVisible={visibleMembers.length}
         />
       ))}
-      {remaining.length > 0 ? (
+      {remainingCount > 0 && (
         <span
-          className="ml-1.5 text-xs whitespace-nowrap text-text-muted"
-          title={remaining.map(({ name }) => name).join("、")}
+          className='ml-1.5 text-xs whitespace-nowrap text-text-secondary'
+          title={remainingNames}
         >
-          <span aria-hidden="true">+{remaining.length}</span>
-          <span className="sr-only">ほか{remaining.length}名</span>
+          +{remainingCount}
         </span>
-      ) : null}
+      )}
     </div>
   );
 }

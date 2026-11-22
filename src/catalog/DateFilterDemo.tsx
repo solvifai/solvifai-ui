@@ -1,110 +1,59 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 
-import { AppButton } from "../ui/AppButton";
-import { DatePicker } from "../ui/DatePicker";
+import { DateTimePicker } from "../ui/DatePicker";
 import { SimpleEmptyState } from "../ui/EmptyState";
-import { FormField } from "../ui/FormField";
-import { Table } from "../ui/Table";
 
-const firstDate = "2026-11-01";
-const lastDate = "2026-11-30";
 const entries = [
-  { name: "秋の写真", date: "2026-11-02" },
-  { name: "野鳥の記録", date: "2026-11-08" },
-  { name: "図書館のメモ", date: "2026-11-12" },
-  { name: "花の観察ノート", date: "2026-11-18" },
-  { name: "散歩の地図", date: "2026-11-23" },
-  { name: "星空のスケッチ", date: "2026-11-29" },
+  { name: "秋の写真", at: "2026-11-02T09:00" },
+  { name: "野鳥の記録", at: "2026-11-08T12:15" },
+  { name: "図書館のメモ", at: "2026-11-12T09:20" },
+  { name: "花の観察ノート", at: "2026-11-18T14:05" },
+  { name: "散歩の地図", at: "2026-11-23T15:50" },
 ];
 
+function shiftMinute(value: string, amount: number) {
+  const millis = new Date(value + "Z").getTime() + amount * 60_000;
+  return new Date(millis).toISOString().slice(0, 16);
+}
+
 export function DateFilterDemo() {
-  const [start, setStart] = useState("2026-11-08");
-  const [end, setEnd] = useState("2026-11-18");
-  const startPicker = useRef<HTMLButtonElement>(null);
-  const invalid = Boolean(start && end && start > end);
-  const visible = entries.filter(({ date }) => (!start || date >= start) && (!end || date <= end));
+  const [{ startAt, endAt }, setRange] = useState({
+    startAt: "2026-11-08T00:00", endAt: "2026-11-18T23:59",
+  });
+  const visible = entries.filter(({ at }) => (!startAt || at >= startAt) && (!endAt || at <= endAt));
+
+  function change(field: "startAt" | "endAt", value: string) {
+    setRange((current) => {
+      const range = { ...current, [field]: value };
+      if (range.startAt && range.endAt && range.startAt >= range.endAt) {
+        if (field === "startAt") range.endAt = shiftMinute(value, 1);
+        else range.startAt = shiftMinute(value, -1);
+      }
+      return range;
+    });
+  }
 
   return (
-    <>
-      <section
-        aria-labelledby="date-filter-heading"
-        className="mt-2 grid gap-4 rounded-xl border border-catalog-line bg-white p-4 sm:p-5"
-      >
-        <div>
-          <h2 id="date-filter-heading" className="text-base font-bold">記録一覧</h2>
-          <p className="mt-1 text-sm text-catalog-muted">2026年11月のサンプル</p>
-        </div>
-        <div className="grid items-end gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
-          <FormField label="開始日" htmlFor="demo-date-start">
-            <DatePicker
-              id="demo-date-start"
-              ref={startPicker}
-              value={start}
-              min={firstDate}
-              max={lastDate}
-              onChange={setStart}
-            />
-          </FormField>
-          <FormField label="終了日" htmlFor="demo-date-end">
-            <DatePicker
-              id="demo-date-end"
-              value={end}
-              min={start || firstDate}
-              max={lastDate}
-              onChange={setEnd}
-              aria-invalid={invalid || undefined}
-              aria-describedby={invalid ? "demo-date-error" : undefined}
-            />
-          </FormField>
-          <AppButton
-            variant="back"
-            className="justify-self-start"
-            disabled={!start && !end}
-            onClick={() => {
-              setStart("");
-              setEnd("");
-              startPicker.current?.focus();
-            }}
-          >
-            期間を解除
-          </AppButton>
-        </div>
-        {invalid && (
-          <p id="demo-date-error" role="alert" className="text-sm text-rose-700">
-            終了日は開始日以降を選んでください。
-          </p>
-        )}
-        <p role="status" className={invalid ? "sr-only" : "text-sm text-catalog-muted"}>
-          {invalid ? "" : `${entries.length}件中 ${visible.length}件を表示`}
-        </p>
-        {!invalid && (
-          <Table aria-label="サンプルの記録" className="table-fixed">
-            <thead>
-              <tr>
-                <th scope="col">名前</th>
-                <th scope="col" className="w-29 sm:w-36">記録日</th>
-              </tr>
-            </thead>
-            <tbody>
-              {visible.map(({ name, date }) => (
-                <tr key={name}>
-                  <th scope="row">{name}</th>
-                  <td><time dateTime={date}>{date.replaceAll("-", "/")}</time></td>
-                </tr>
-              ))}
-              {visible.length === 0 && (
-                <tr>
-                  <td colSpan={2}><SimpleEmptyState message="この期間に記録はありません" /></td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-        )}
-      </section>
-      <div className="mt-4 flex flex-wrap gap-x-5">
-        <a className="source-link" href="#date-picker">日付入力の使い方</a>
-        <a className="source-link" href="#table">テーブルの使い方</a>
+    <section aria-label="期間フィルターの例" className="grid gap-3 rounded-xl border border-catalog-line bg-white p-4">
+      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border-primary bg-white px-3 py-2">
+        <span id="filter-zone" className="text-sm text-text-secondary">日時（日本時間）</span>
+        <DateTimePicker aria-label="開始日時" aria-describedby="filter-zone" value={startAt}
+          onChange={(event) => change("startAt", event.currentTarget.value)} />
+        <span aria-hidden="true" className="text-text-secondary">〜</span>
+        <DateTimePicker aria-label="終了日時" aria-describedby="filter-zone" value={endAt}
+          onChange={(event) => change("endAt", event.currentTarget.value)} />
       </div>
-    </>
+      <p role="status" className="text-sm text-catalog-muted">{visible.length}件を表示</p>
+      {visible.length ? (
+        <ul className="divide-y divide-catalog-line">
+          {visible.map(({ name, at }) => (
+            <li key={name} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
+              <span>{name}</span>
+              <time dateTime={at} className="text-text-secondary">{at.replace("T", " ")}</time>
+            </li>
+          ))}
+        </ul>
+      ) : <SimpleEmptyState message="この期間に記録はありません" />}
+    </section>
   );
 }

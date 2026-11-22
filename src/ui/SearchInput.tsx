@@ -21,10 +21,10 @@ export function SearchInput({
 }: SearchInputProps) {
   return (
     <div className={`relative ${className}`}>
-      <SearchIcon className="absolute top-1/2 left-3.5 -translate-y-1/2 text-text-muted" />
+      <SearchIcon className="absolute top-1/2 left-3.5 -translate-y-1/2 text-text-secondary" />
       <input
         ref={ref}
-        type="search"
+        type="text"
         aria-label={ariaLabel}
         value={value}
         onChange={(e) => onChange(e.target.value)}

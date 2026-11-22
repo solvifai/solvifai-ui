@@ -1,100 +1,76 @@
-import { Menu } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Binoculars, Compass, House, X } from "lucide-react";
+import { useRef, useState } from "react";
 
-import { Accordion } from "../ui/Accordion";
-import { AppButton } from "../ui/AppButton";
-import { cn } from "../ui/cn";
+import { MenuItemLink } from "../ui/MenuItemLink";
+import { IconChevronLeft } from "../ui/sidebar-icons";
 
 const sections = [
-  { label: "概要", text: "近所で見つけた生き物を記録するノートです。" },
-  { label: "野鳥", text: "池のそばでカルガモを見かけました。" },
-  { label: "草花", text: "遊歩道のわきに白い花が咲いていました。" },
-  { label: "行きたい場所", text: "次の観察先は川沿いの遊歩道です。" },
+  { label: "概要", icon: House },
+  { label: "観察記録", icon: Binoculars },
+  { label: "散歩先", icon: Compass },
 ];
 
 export function SideNavDemo() {
-  const [active, setActive] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const heading = useRef<HTMLHeadingElement>(null);
-  const menuButton = useRef<HTMLButtonElement>(null);
-  const moved = useRef(false);
-
-  useEffect(() => {
-    if (!moved.current) return;
-    moved.current = false;
-    heading.current?.focus();
-  }, [active]);
-
-  function navItem(index: number) {
-    return (
-      <button
-        type="button"
-        aria-current={index === active ? "page" : undefined}
-        className={cn(
-          "min-h-10 w-full rounded-md px-3 py-2 text-left text-sm hover:bg-blue-50",
-          index === active ? "bg-blue-50 font-semibold text-brand-foreground" : "text-text-primary",
-        )}
-        onClick={() => {
-          setMenuOpen(false);
-          if (index === active) {
-            heading.current?.focus();
-            return;
-          }
-          moved.current = true;
-          setActive(index);
-        }}
-      >
-        {sections[index].label}
-      </button>
-    );
-  }
+  const [expanded, setExpanded] = useState(false);
+  const [active, setActive] = useState("概要");
+  const [subOpen, setSubOpen] = useState(false);
+  const groupButton = useRef<HTMLButtonElement>(null);
 
   return (
-    <>
-      <section aria-label="観察ノート" className="rounded-xl border border-catalog-line bg-white">
-        <div className="flex items-center justify-between gap-2 border-b border-catalog-line p-4 sm:hidden">
-          <span className="text-sm font-bold">観察ノート</span>
-          <AppButton
-            ref={menuButton}
-            variant="back"
-            aria-controls="side-nav-demo-menu"
-            aria-expanded={menuOpen}
-            iconLeft={<Menu size={16} aria-hidden="true" />}
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            メニュー
-          </AppButton>
+    <section aria-label="観察ノート"
+      className="flex min-h-56 rounded-xl border border-catalog-line bg-white">
+      <nav aria-label="観察ノートのメニュー"
+        className={`shrink-0 border-r border-border-primary motion-safe:transition-[width] ${expanded ? "w-[min(40vw,200px)]" : "w-12"}`}>
+        <div className="flex justify-end px-3 pt-5 pb-1">
+          <button type="button" aria-expanded={expanded} aria-controls="side-nav-demo-items"
+            aria-label={expanded ? "サイドバーを閉じる" : "サイドバーを開く"}
+            className="grid size-6 place-items-center text-text-secondary"
+            onClick={() => setExpanded(!expanded)}>
+            <IconChevronLeft className={expanded ? undefined : "rotate-180"} />
+          </button>
         </div>
-        <div className="sm:grid sm:grid-cols-[11rem_minmax(0,1fr)]">
-          <nav
-            id="side-nav-demo-menu"
-            aria-label="観察ノートのナビゲーション"
-            className={cn(
-              "border-b border-catalog-line p-3 sm:border-r sm:border-b-0",
-              menuOpen ? "block" : "hidden sm:block",
-            )}
-            onKeyDown={(event) => {
-              if (event.key === "Escape" && menuOpen) {
-                setMenuOpen(false);
-                menuButton.current?.focus();
-              }
-            }}
-          >
-            <p className="hidden px-3 py-2 text-sm font-bold sm:block">観察ノート</p>
-            {navItem(0)}
-            <Accordion className="my-1" heading="観察記録">
-              {navItem(1)}
-              {navItem(2)}
-            </Accordion>
-            {navItem(3)}
-          </nav>
-          <div className="min-h-35 p-4 sm:p-5">
-            <h2 ref={heading} tabIndex={-1} className="text-lg font-bold">{sections[active].label}</h2>
-            <p className="mt-2 text-sm text-catalog-muted">{sections[active].text}</p>
+        <ul id="side-nav-demo-items" className="grid gap-2 pt-4">
+          {sections.map(({ label, icon: Icon }) => (
+            <li key={label}>
+              <MenuItemLink active={active === label} aria-label={label}
+                ref={label === "観察記録" ? groupButton : undefined}
+                aria-expanded={label === "観察記録" ? subOpen : undefined}
+                aria-controls={label === "観察記録" && subOpen ? "side-nav-demo-group" : undefined}
+                title={expanded ? undefined : label}
+                prefix={<Icon size={20} className="shrink-0" aria-hidden="true" />}
+                className={expanded ? "gap-2 px-3 py-3" : "justify-center py-3"}
+                onClick={() => {
+                  setActive(label);
+                  setSubOpen(label === "観察記録" && !subOpen);
+                }}>
+                {expanded && <span className="truncate text-sm">{label}</span>}
+              </MenuItemLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      {subOpen && (
+        <nav id="side-nav-demo-group" aria-label="観察記録の項目"
+          className="w-[min(29vw,209px)] shrink-0 border-r border-border-primary">
+          <div className="flex justify-end p-3">
+            <button type="button" aria-label="サブメニューを閉じる" className="size-6 text-text-secondary"
+              onClick={() => {
+                setSubOpen(false);
+                groupButton.current?.focus();
+              }}><X size={14} className="mx-auto" aria-hidden="true" /></button>
           </div>
-        </div>
-      </section>
-      <a className="source-link mt-4" href="#accordion">グループ開閉の使い方</a>
-    </>
+          {["野鳥", "草花"].map((label) => (
+            <MenuItemLink key={label} active={active === label}
+              prefix={<span aria-hidden="true" className="size-2.5 shrink-0 rounded-full bg-brand-gradient opacity-70" />}
+              className="gap-2 px-2 py-3 text-sm sm:px-5" onClick={() => setActive(label)}>
+              {label}
+            </MenuItemLink>
+          ))}
+        </nav>
+      )}
+      <div className="min-w-0 flex-1 p-3 sm:p-4">
+        <h2 className="wrap-anywhere text-base font-bold">{active}</h2>
+      </div>
+    </section>
   );
 }

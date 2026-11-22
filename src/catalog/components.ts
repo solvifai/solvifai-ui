@@ -8,27 +8,22 @@ import {
   CloudUpload,
   CircleDot,
   ChevronRight,
-  ChevronDown,
   ChevronsUpDown,
   EllipsisVertical,
   GripVertical,
   FileSearch,
-  Info,
   Gauge,
   ListOrdered,
   ListChecks,
   LoaderCircle,
   MousePointer2,
-  PanelRight,
   PanelTop,
   Paperclip,
-  Rows3,
   StepForward,
   Search,
   Tag,
   TextCursorInput,
   ToggleRight,
-  Table2,
   TriangleAlert,
   Users,
   Upload,
@@ -55,12 +50,14 @@ type Entry = {
   guidance: string[];
   variants: string[];
   file: string;
+  source: string;
   code: string;
 };
 
 export const components = [
   {
     id: "app-button",
+    source: "components/common/AppButton.tsx",
     name: "AppButton",
     label: "ボタン",
     category: "操作",
@@ -69,19 +66,20 @@ export const components = [
     guidance: [
       "保存や作成など、操作のまとまりで最も優先するアクションに primary を使います。",
       "キャンセルや補助操作は secondary、前の画面に移動する操作は back を使います。",
-      'フォーム送信には type="submit" を指定します。押せない場合は近くに理由を表示します。',
+      '押せない場合は disabled を指定し、必要に応じて近くに理由を表示します。',
     ],
     variants: ["Primary", "Secondary", "Back", "Disabled"],
     file: "AppButton.tsx",
     code: `import { AppButton } from "./ui/AppButton";
 
 <>
-  <AppButton variant="primary" type="submit">保存する</AppButton>
+  <AppButton variant="primary" onClick={onSave}>保存する</AppButton>
   <AppButton variant="secondary" onClick={onCancel}>キャンセル</AppButton>
 </>`,
   },
   {
     id: "text-input",
+    source: "components/form/TextInput.tsx",
     name: "TextInput",
     label: "テキスト入力",
     category: "入力",
@@ -90,9 +88,8 @@ export const components = [
     guidance: [
       "FormField の htmlFor と TextInput の id を揃え、入力項目のラベルを表示します。",
       "プレースホルダーには入力例を入れます。",
-      "エラー時は invalid を指定し、describedBy で具体的なエラー文と関連付けます。",
     ],
-    variants: ["Default", "Filled", "Invalid", "Disabled"],
+    variants: ["Default", "Filled", "Disabled"],
     file: "TextInput.tsx",
     code: `import { FormField } from "./ui/FormField";
 import { TextInput } from "./ui/TextInput";
@@ -108,6 +105,7 @@ import { TextInput } from "./ui/TextInput";
   },
   {
     id: "search-input",
+    source: "components/form/SearchInput.tsx",
     name: "SearchInput",
     label: "検索入力",
     category: "入力",
@@ -131,6 +129,7 @@ import { TextInput } from "./ui/TextInput";
   },
   {
     id: "select-box",
+    source: "features/sheet-format/components/MultiTableOutputSelect.tsx",
     name: "SelectBox",
     label: "セレクトボックス",
     category: "入力",
@@ -138,11 +137,9 @@ import { TextInput } from "./ui/TextInput";
     description: "決められた選択肢から1つを選びます。",
     guidance: [
       "FormField のラベルで選ぶ項目を示し、各選択肢に一意の value を指定します。",
-      '未選択は value="" で表します。必須項目は required を指定し、送信時にフォーム側で値を検証します。',
-      "エラー時は invalid を指定し、describedBy で修正方法を示す文に関連付けます。",
       "上下キーで選択肢を移動し、Enter で選択、Esc で閉じられます。",
     ],
-    variants: ["未選択", "選択済み", "エラー", "無効"],
+    variants: ["選択済み", "無効", "キーボード操作"],
     file: "SelectBox.tsx",
     code: `import { FormField } from "./ui/FormField";
 import { SelectBox } from "./ui/SelectBox";
@@ -163,6 +160,7 @@ import { SelectBox } from "./ui/SelectBox";
   },
   {
     id: "checkbox",
+    source: "components/form/Checkbox.tsx",
     name: "Checkbox",
     label: "チェックボックス",
     category: "入力",
@@ -185,6 +183,7 @@ import { SelectBox } from "./ui/SelectBox";
   },
   {
     id: "badge",
+    source: "components/common/Badge.tsx",
     name: "Badge",
     label: "バッジ",
     category: "状態表示",
@@ -207,6 +206,7 @@ import { SelectBox } from "./ui/SelectBox";
   },
   {
     id: "dialog",
+    source: "components/shadcn/Dialog.tsx",
     name: "Dialog",
     label: "ダイアログ",
     category: "操作",
@@ -241,6 +241,7 @@ import {
   },
   {
     id: "loading-spinner",
+    source: "components/common/LoadingSpinner.tsx",
     name: "LoadingSpinner",
     label: "読み込み",
     category: "状態表示",
@@ -258,6 +259,7 @@ import {
   },
   {
     id: "empty-state",
+    source: "components/common/EmptyState.tsx",
     name: "SimpleEmptyState",
     label: "空の状態",
     category: "状態表示",
@@ -278,6 +280,7 @@ import {
   },
   {
     id: "row-action-menu",
+    source: "components/common/RowActionMenu.tsx",
     name: "RowActionMenu",
     label: "三点メニュー",
     category: "操作",
@@ -308,6 +311,7 @@ import { CopyIcon, TrashIcon } from "./ui/icons";
   },
   {
     id: "table-pagination",
+    source: "components/common/TablePagination.tsx",
     name: "TablePagination",
     label: "ページ送り",
     category: "ナビゲーション",
@@ -330,37 +334,8 @@ import { CopyIcon, TrashIcon } from "./ui/icons";
 />`,
   },
   {
-    id: "table",
-    name: "Table",
-    label: "テーブル",
-    category: "データ表示",
-    icon: Table2,
-    description: "列見出しと行を揃えて、複数の項目を比較できる形で表示します。",
-    guidance: [
-      "列見出しには th と scope='col' を使い、行を識別するセルには scope='row' を使います。",
-      "並び替えできる列は、見出しのボタンと aria-sort で現在の順序を伝えます。",
-      "選択中の行に data-selected='true' を付けると背景が変わります。0件のときは一覧内に空の状態を表示します。",
-    ],
-    variants: ["基本", "並び替え", "行選択", "0件"],
-    file: "Table.tsx",
-    code: `import { Table } from "./ui/Table";
-
-<Table aria-label="資料一覧">
-  <thead>
-    <tr><th scope="col">ファイル名</th><th scope="col">更新日</th></tr>
-  </thead>
-  <tbody>
-    {files.map((file) => (
-      <tr key={file.id} data-selected={selectedIds.has(file.id) || undefined}>
-        <th scope="row">{file.name}</th>
-        <td>{file.updatedAt}</td>
-      </tr>
-    ))}
-  </tbody>
-</Table>`,
-  },
-  {
     id: "file-chip-list",
+    source: "components/deliverable/FileChipList.tsx",
     name: "FileChipList",
     label: "添付ファイルチップ",
     category: "入力",
@@ -382,6 +357,7 @@ import { CopyIcon, TrashIcon } from "./ui/icons";
   },
   {
     id: "avatar-group",
+    source: "components/common/AvatarGroup.tsx",
     name: "AvatarGroup",
     label: "アバターグループ",
     category: "データ表示",
@@ -404,27 +380,24 @@ import { CopyIcon, TrashIcon } from "./ui/icons";
   },
   {
     id: "save-status-indicator",
+    source: "components/slide/SaveStatusIndicator.tsx",
     name: "SaveStatusIndicator",
     label: "保存状態",
     category: "状態表示",
     icon: CloudUpload,
-    description: "自動保存の待機・進行・成功・失敗を、編集画面内に表示します。",
+    description: "本体の保存状態を、アイコンとテキストで表示します。",
     guidance: [
-      "編集中も目に入る位置に置き、実際の保存処理に合わせて status を更新します。",
-      "失敗時に再試行できる場合は、状態表示の近くに再試行ボタンを置きます。",
+      "保存処理の状態を status に渡します。idle はクラウドアイコンのみ表示されます。",
     ],
-    variants: ["待機中", "保存中", "保存済み", "失敗"],
+    variants: ["待機中", "未保存", "保存中", "保存済み", "失敗"],
     file: "SaveStatusIndicator.tsx",
-    code: `import { AppButton } from "./ui/AppButton";
-import { SaveStatusIndicator } from "./ui/SaveStatusIndicator";
+    code: `import { SaveStatusIndicator } from "./ui/SaveStatusIndicator";
 
-<>
-  <SaveStatusIndicator status={saveStatus} />
-  {saveStatus === "error" ? <AppButton onClick={retrySave}>再試行</AppButton> : null}
-</>`,
+<SaveStatusIndicator status={saveStatus} />`,
   },
   {
     id: "option-group",
+    source: "components/form/OptionGroup.tsx",
     name: "OptionGroup",
     label: "選択肢グループ",
     category: "入力",
@@ -451,13 +424,14 @@ import { SaveStatusIndicator } from "./ui/SaveStatusIndicator";
   },
   {
     id: "tabs",
+    source: "components/deliverable/DocumentSelectModal.tsx",
     name: "Tabs",
     label: "タブ",
     category: "ナビゲーション",
     icon: AppWindow,
     description: "同じ画面内で、関連する表示内容を切り替えます。",
     guidance: [
-      "資料選択画面の「PJ個別データ」「全体共通データ」のように、表示対象の違いを短いラベルで示します。",
+      "資料選択画面の「グループ内」「全体」のように、表示対象の違いを短いラベルで示します。",
       "左右キー、Home、End で切り替えられます。利用できないタブには disabled を指定します。",
       "タブを切り替えても作業を続けられるよう、入力や選択の状態を必要に応じて保持します。",
     ],
@@ -470,13 +444,14 @@ import { SaveStatusIndicator } from "./ui/SaveStatusIndicator";
   value={activeTab}
   onChange={setActiveTab}
   tabs={[
-    { value: "individual", label: "PJ個別データ", panel: <ProjectFiles /> },
-    { value: "shared", label: "全体共通データ", panel: <SharedFiles /> },
+    { value: "individual", label: "グループ内", panel: <ProjectFiles /> },
+    { value: "shared", label: "全体", panel: <SharedFiles /> },
   ]}
 />`,
   },
   {
     id: "toast",
+    source: "routes/__root.tsx",
     name: "AppToaster",
     label: "トースト",
     category: "状態表示",
@@ -500,30 +475,8 @@ toast.warning("PPTXファイルを選択してください");
 toast.error("ファイルを移動できませんでした");`,
   },
   {
-    id: "tooltip",
-    name: "Tooltip",
-    label: "ツールチップ",
-    category: "状態表示",
-    icon: Info,
-    description: "アイコンや操作ボタンの意味を短く補足します。",
-    guidance: [
-      "成果物ヘッダーの「作成理由ハイライト」のように、操作の補足に使います。",
-      "ホバーまたはキーボードでフォーカスすると表示され、Esc で閉じられます。",
-      "アイコンボタンには aria-label を付けます。必須の説明は画面上にも表示します。",
-    ],
-    variants: ["ホバー", "フォーカス", "上・下に表示"],
-    file: "Tooltip.tsx",
-    code: `import { Tooltip } from "./ui/Tooltip";
-import { EyeIcon } from "./ui/icons";
-
-<Tooltip content="作成理由ハイライトを表示">
-  <button type="button" aria-label="作成理由ハイライト" onClick={toggleHighlight}>
-    <EyeIcon />
-  </button>
-</Tooltip>`,
-  },
-  {
     id: "radio",
+    source: "features/data-utilization/DataManagementPage.tsx",
     name: "Radio",
     label: "ラジオボタン",
     category: "入力",
@@ -540,12 +493,13 @@ import { EyeIcon } from "./ui/icons";
 
 <fieldset>
   <legend>フォルダ分類</legend>
-  <Radio name="folder-type" value="project" label="PJ個別データ" defaultChecked />
-  <Radio name="folder-type" value="shared" label="全体共有データ" />
+  <Radio name="folder-type" value="project" label="グループ内" defaultChecked />
+  <Radio name="folder-type" value="shared" label="全体" />
 </fieldset>`,
   },
   {
     id: "toggle",
+    source: "components/chat/PromptPanel.tsx",
     name: "Toggle",
     label: "トグル",
     category: "入力",
@@ -563,54 +517,27 @@ import { EyeIcon } from "./ui/icons";
 <Toggle ariaLabel="高精度" checked={highAccuracy} onChange={setHighAccuracy} />`,
   },
   {
-    id: "accordion",
-    name: "Accordion",
-    label: "アコーディオン",
-    category: "ナビゲーション",
-    icon: ChevronDown,
-    description: "編集ガイドのステップのように、見出しごとに内容を開閉します。",
-    guidance: [
-      "見出しだけで何が入っているか分かる文言を使い、詳しい説明や項目を中に置きます。",
-      "クリックや Enter・Space で開閉します。初期表示から見せたい項目には open を指定します。",
-      "項目を1つずつ開く場合は、同じグループの項目に共通の name を指定します。",
-    ],
-    variants: ["閉じる", "開く", "複数項目"],
-    file: "Accordion.tsx",
-    code: `import { Accordion } from "./ui/Accordion";
-
-<Accordion heading="構成を確認する" open>
-  目次の見出しと順序を確認します。
-</Accordion>
-<Accordion heading="表記を整える">
-  固有名詞や表記の揺れを確認します。
-</Accordion>`,
-  },
-  {
     id: "file-upload",
-    name: "FileUpload",
+    source: "components/deliverable/FileDropzone.tsx",
+    name: "FileDropzone",
     label: "ファイルアップロード",
     category: "入力",
     icon: Upload,
-    description: "クリックやドラッグ＆ドロップでファイルを選びます。",
+    description: "単一ファイルを選択またはドロップします。",
     guidance: [
-      "フォーマット作成のPPTXアップロード欄と同様に、指定できる形式を選択前に示します。",
-      "accept に対応する拡張子またはMIMEタイプを指定します。ドロップしたファイルにも同じ検証がかかります。",
-      "送信処理は onFiles の呼び出し元で行います。処理中は isUploading を指定します。",
+      "ファイルの選択、解除、形式エラーを表示します。選択したファイルの検証と送信は呼び出し側で行います。",
     ],
-    variants: ["選択", "ドラッグ＆ドロップ", "形式エラー"],
-    file: "FileUpload.tsx",
-    code: `import { FileUpload } from "./ui/FileUpload";
+    variants: ["未選択", "選択済み", "形式エラー"],
+    file: "FileDropzone.tsx",
+    code: `import { FileDropzone } from "./ui/FileDropzone";
 
-<FileUpload
-  accept=".pptx"
-  hint="PPTXファイルのみ対応"
-  isUploading={isUploading}
-  onFiles={uploadFiles}
-/>`,
+<FileDropzone file={file} error={error} accept=".pptx" hint="PPTXファイルを選択"
+  onSelect={selectFile} onClear={clearFile} />`,
   },
   {
     id: "progress-bar",
-    name: "ProgressBar",
+    source: "components/slide/SlideGenerationProgress.tsx",
+    name: "SlideGenerationProgress",
     label: "プログレスバー",
     category: "状態表示",
     icon: Gauge,
@@ -621,16 +548,17 @@ import { EyeIcon } from "./ui/icons";
       "進捗の割合が分からない場合は読み込み表示を使います。",
     ],
     variants: ["開始前", "処理中", "完了"],
-    file: "ProgressBar.tsx",
-    code: `import { ProgressBar } from "./ui/ProgressBar";
+    file: "SlideGenerationProgress.tsx",
+    code: `import { SlideGenerationProgress } from "./ui/SlideGenerationProgress";
 
-<ProgressBar
+<SlideGenerationProgress
   label={progress === 100 ? "生成完了" : "スライド生成中"}
   progress={progress}
 />`,
   },
   {
     id: "stepped-form",
+    source: "components/common/SteppedForm.tsx",
     name: "SteppedForm",
     label: "ステップ表示",
     category: "ナビゲーション",
@@ -639,7 +567,7 @@ import { EyeIcon } from "./ui/icons";
     guidance: [
       "入力内容のまとまりごとに Step を置き、短い見出しを付けます。",
       "complete が true に変わると次の項目が開きます。完了の判定は画面側で入力内容に合わせます。",
-      "各ステップは見出しから開閉できます。閉じても入力内容は保持されます。",
+      "各ステップは見出しから開閉できます。入力値は画面側で保持します。",
     ],
     variants: ["未着手", "入力中", "完了", "次の項目を自動展開"],
     file: "SteppedForm.tsx",
@@ -656,6 +584,7 @@ import { EyeIcon } from "./ui/icons";
   },
   {
     id: "text-area",
+    source: "components/projects/ProjectForm.tsx",
     name: "TextArea",
     label: "テキストエリア",
     category: "入力",
@@ -683,171 +612,78 @@ import { TextArea } from "./ui/TextArea";
   },
   {
     id: "date-picker",
+    source: "components/projects/ProjectForm.tsx",
     name: "DatePicker",
     label: "日付ピッカー",
     category: "入力",
     icon: CalendarDays,
-    description: "プロジェクト期間などの日付を、月ごとのカレンダーから選びます。",
+    description: "ブラウザ標準の日付入力です。",
     guidance: [
-      "ラベルで「開始日」「終了日」のように、指定する対象を示します。",
-      "値は YYYY-MM-DD 形式です。min と max で選べる範囲を指定します。",
-      "矢印キーで日を移動し、Enter で選択します。Page Up / Down で月、Shift と併用すると年を移動します。",
+      "値は YYYY-MM-DD 形式です。終了日の下限には開始日を渡せます。",
     ],
-    variants: ["カレンダー", "選択範囲", "キーボード操作"],
+    variants: ["ブラウザ標準", "日付範囲"],
     file: "DatePicker.tsx",
     code: `import { DatePicker } from "./ui/DatePicker";
 
-<DatePicker
-  aria-label="終了日"
-  min={startDate || undefined}
-  value={endDate}
-  onChange={setEndDate}
-/>`,
+<DatePicker aria-label="終了日" min={startDate || undefined}
+  value={endDate} onChange={(event) => setEndDate(event.currentTarget.value)} />`,
   },
   {
     id: "date-time-picker",
+    source: "routes/settings/log-info.tsx",
     name: "DateTimePicker",
     label: "日時ピッカー",
     category: "入力",
     icon: CalendarClock,
-    description: "ログ管理などの開始・終了日時を、カレンダーと24時間制の時刻欄で指定します。",
+    description: "ブラウザ標準の日時入力で、開始と終了を分単位で指定します。",
     guidance: [
-      "期間を指定するときは「開始日時」と「終了日時」のラベルを付けます。",
-      "日付と時刻を指定して「適用」で確定します。値と min / max は YYYY-MM-DDTHH:mm 形式です。",
-      "timeZone に Asia/Tokyo を渡すと「今日」が日本時間に従います。値のタイムゾーン変換は送信側で行い、入力の近くに使用するタイムゾーンを示します。",
+      "値は YYYY-MM-DDTHH:mm 形式です。使用するタイムゾーンは画面に明示し、変換は呼び出し側で行います。",
     ],
-    variants: ["24時間表示", "分単位", "範囲エラー"],
+    variants: ["ブラウザ標準", "分単位"],
     file: "DatePicker.tsx",
     code: `import { DateTimePicker } from "./ui/DatePicker";
 
-<DateTimePicker
-  aria-label="終了日時（日本時間）"
-  timeZone="Asia/Tokyo"
-  min={startAt || undefined}
-  value={endAt}
-  onChange={setEndAt}
-/>`,
+<DateTimePicker aria-label="終了日時（日本時間）"
+  value={endAt} onChange={(event) => setEndAt(event.currentTarget.value)} />`,
   },
   {
     id: "resizable-panel",
+    source: "components/common/ResizeDivider.tsx",
     name: "ResizeDivider",
     label: "リサイズできるパネル",
     category: "ナビゲーション",
     icon: GripVertical,
-    description: "フォーマット編集画面と同じように、境界を動かしてパネルの幅を調整します。",
+    description: "パネルの境界をドラッグして幅を調整します。",
     guidance: [
-      "左右の領域の境界に置き、position で幅を変えるパネルの側を指定します。",
-      "親で幅を保持し、min と max で各領域に必要な幅を確保します。",
-      "ドラッグとタッチのほか、左右キーで8px、Shift＋左右キーで32px調整できます。Home と End で上下限に移動します。",
+      "onResize は移動量を渡します。最小幅と最大幅は呼び出し側で管理します。",
     ],
-    variants: ["ドラッグ", "タッチ", "キーボード", "最小・最大幅"],
+    variants: ["左側", "右側", "ドラッグ"],
     file: "ResizeDivider.tsx",
     code: `import { ResizeDivider } from "./ui/ResizeDivider";
 
-<ResizeDivider
-  position="left"
-  ariaLabel="スライド一覧の幅"
-  controls="slide-preview-panel"
-  min={120}
-  max={400}
-  value={width}
-  onResize={(delta) =>
-    setWidth((previous) => Math.max(120, Math.min(400, previous + delta)))
-  }
-/>`,
+<ResizeDivider position="left" onResize={(delta) =>
+  setWidth((width) => Math.max(160, Math.min(480, width + delta)))} />`,
   },
   {
     id: "alert-banner",
-    name: "AlertBanner",
-    label: "アラートバナー",
+    source: "features/data-utilization/DataManagementPage.tsx",
+    name: "QueryError",
+    label: "読み込みエラー",
     category: "状態表示",
     icon: TriangleAlert,
-    description: "プロジェクト編集の情報取得エラーのように、その場に通知と対処方法を表示します。",
+    description: "データの取得に失敗した場合に、原因と再読み込み操作を表示します。",
     guidance: [
-      "情報を取得できない場合は error、編集範囲の制限などの注意事項には warning を使います。",
-      "何が起きたか、入力が保持されているか、どう対処できるかを短く伝えます。",
-      "再取得などその場でできる操作は action に渡します。",
+      "失敗した箇所に表示します。retry には同じデータを再取得する処理を渡します。",
     ],
-    variants: ["エラー", "再取得", "注意"],
-    file: "AlertBanner.tsx",
-    code: `import { AlertBanner } from "./ui/AlertBanner";
-import { AppButton } from "./ui/AppButton";
+    variants: ["エラー", "再読み込み"],
+    file: "QueryError.tsx",
+    code: `import { QueryError } from "./ui/QueryError";
 
-<AlertBanner
-  tone="error"
-  action={
-    <AppButton disabled={refreshing} onClick={retry}>
-      {refreshing ? "再取得中…" : "再取得"}
-    </AppButton>
-  }
->
-  最新情報を取得できませんでした。入力内容は保持しています。
-</AlertBanner>`,
-  },
-  {
-    id: "skeleton",
-    name: "Skeleton",
-    label: "スケルトン",
-    category: "状態表示",
-    icon: Rows3,
-    description: "成果物の一括編集で修正案を待つ間、結果が出る位置に読み込み状態を表示します。",
-    guidance: [
-      "読み込み中の箇所に置き、結果が届いたら同じ位置に内容を表示します。",
-      "label には「修正案作成中」のように、何を待っているかを指定します。",
-      "動きを減らす端末設定では、バーを静止した状態で表示します。",
-    ],
-    variants: ["作成中", "結果に切り替え", "動きを減らす"],
-    file: "Skeleton.tsx",
-    code: `import { Skeleton } from "./ui/Skeleton";
-
-<>
-  {isDrafting ? (
-    <Skeleton label="修正案作成中…" />
-  ) : (
-    <DraftResult content={draft} />
-  )}
-</>`,
-  },
-  {
-    id: "drawer",
-    name: "Drawer",
-    label: "ドロワー",
-    category: "ナビゲーション",
-    icon: PanelRight,
-    description: "編集画面のバージョン履歴のような補助情報を、作業領域の右側に開きます。",
-    guidance: [
-      "編集エリアと横に並べ、開いている間も作業を続けられるようにします。",
-      "開閉ボタンの aria-controls とパネルの id を揃え、aria-expanded に状態を渡します。",
-      "閉じるボタンやパネル内の Escape キーから閉じた場合は、開閉ボタンにフォーカスを戻します。",
-    ],
-    variants: ["右側に表示", "閉じる", "Escape で閉じる"],
-    file: "Drawer.tsx",
-    code: `import { useId, useRef, useState } from "react";
-import { AppButton } from "./ui/AppButton";
-import { Drawer } from "./ui/Drawer";
-
-const id = useId();
-const trigger = useRef<HTMLButtonElement>(null);
-const [open, setOpen] = useState(false);
-
-<>
-  <AppButton ref={trigger} aria-expanded={open} aria-controls={id}
-    onClick={() => setOpen(!open)}>
-    {open ? "履歴を閉じる" : "履歴を開く"}
-  </AppButton>
-  <div className="flex">
-    <section className="min-w-0 flex-1"><Editor /></section>
-    <Drawer id={id} title="バージョン履歴" open={open} onClose={() => {
-      setOpen(false);
-      trigger.current?.focus();
-    }}>
-      <VersionHistory />
-    </Drawer>
-  </div>
-</>`,
+<QueryError error={loadError} retry={refetch} />`,
   },
   {
     id: "breadcrumb",
+    source: "components/common/Breadcrumb.tsx",
     name: "SimpleBreadcrumb",
     label: "パンくず",
     category: "ナビゲーション",

@@ -1,104 +1,61 @@
-import {
-  CalendarRange, Cloud, LayoutList, ListChecks, PanelLeft, PanelRight, PanelsTopLeft,
-  RotateCw, Search, Signpost, Upload,
-} from "lucide-react";
+import { Bell, CalendarRange, Cloud, ListChecks, PanelLeft, RotateCw, Search, Upload } from "lucide-react";
 
-import { AppHeaderDemo } from "./AppHeaderDemo";
 import { AutosaveDemo } from "./AutosaveDemo";
 import { DateFilterDemo } from "./DateFilterDemo";
 import { FileList } from "./FileList";
 import { LoadingRetryDemo } from "./LoadingRetryDemo";
-import { ListDetailDemo } from "./ListDetailDemo";
-import { PageHeaderDemo } from "./PageHeaderDemo";
+import { NotificationDemo } from "./NotificationDemo";
 import { SideNavDemo } from "./SideNavDemo";
-import { StepReviewDemo } from "./StepReviewDemo";
 import { UploadDemo } from "./UploadDemo";
+import { sourceUrl } from "./sources";
+
+const dataManagement = "features/data-utilization/DataManagementPage.tsx";
 
 export const patterns = [
   {
-    href: "#file-list",
-    label: "複数選択と一括削除",
-    icon: ListChecks,
-    description:
-      "ファイルを複数選び、まとめて削除する前に対象を確認できます。選択は検索やページ送りをしても保持されます。",
-    demo: <FileList />,
+    href: "#file-list", label: "複数選択と一括削除", icon: ListChecks,
+    description: "行を選ぶと、一括操作のメニューから削除を確認できます。",
+    source: dataManagement, demo: <FileList />,
   },
   {
-    href: "#pattern-search-empty",
-    label: "検索結果が0件",
-    icon: Search,
-    description:
-      "一致するファイルがないときに、結果が0件であることと次にできる操作を表示します。検索をクリアすると一覧に戻ります。",
-    demo: <FileList initialQuery="見本にない名前" />,
+    href: "#pattern-search-empty", label: "検索結果が0件", icon: Search,
+    description: "検索条件に一致する項目がない場合の表示です。検索欄を空にすると全件に戻ります。",
+    source: dataManagement, demo: <FileList initialQuery="見本にない名前" />,
   },
   {
-    href: "#pattern-loading-retry",
-    label: "読み込み失敗と再試行",
-    icon: RotateCw,
-    description: "最初の読み込みが失敗するデモです。「再試行」を押すとサンプルの一覧を表示します。",
-    demo: <LoadingRetryDemo />,
+    href: "#pattern-loading-retry", label: "読み込み失敗と再読み込み", icon: RotateCw,
+    description: "最初の読み込みが失敗するデモです。再読み込みでサンプル一覧を表示します。",
+    source: dataManagement, demo: <LoadingRetryDemo />,
   },
   {
-    href: "#pattern-autosave",
-    label: "自動保存",
-    icon: Cloud,
-    description: "メモを書くと、入力が止まってからこのブラウザに自動保存されます。保存失敗と再試行も試せます。",
-    demo: <AutosaveDemo />,
+    href: "#pattern-autosave", label: "自動保存", icon: Cloud,
+    description: "最後の編集から5秒後にこのブラウザへ保存します。失敗しても入力は残り、編集を再開すると保存を試みます。",
+    source: "routes/sheet/$id/-features/-hooks/useSheetAutoSave.ts", demo: <AutosaveDemo />,
   },
   {
-    href: "#pattern-file-upload",
-    label: "複数ファイルのアップロード",
-    icon: Upload,
-    description:
-      "ファイルごとの進捗を表示し、失敗したファイルだけを再試行できます。ファイル名と模擬の送信結果を使うデモです。",
-    demo: <UploadDemo />,
+    href: "#pattern-file-upload", label: "複数ファイル追加", icon: Upload,
+    description: "ファイルを複数選び、一括追加します。デモではファイル名だけを表示します。",
+    source: dataManagement, demo: <UploadDemo />,
   },
   {
-    href: "#pattern-date-filter",
-    label: "期間フィルター",
-    icon: CalendarRange,
-    description: "開始日と終了日を含む期間で一覧を絞り込みます。「期間を解除」で全件に戻ります。",
-    demo: <DateFilterDemo />,
+    href: "#pattern-date-filter", label: "日時フィルター", icon: CalendarRange,
+    description: "ブラウザ標準の日時入力で絞り込みます。開始と終了が逆転すると、もう一方を1分ずらして調整します。",
+    source: "routes/settings/log-info.tsx", demo: <DateFilterDemo />,
   },
   {
-    href: "#pattern-app-header",
-    label: "アプリヘッダー",
-    icon: PanelsTopLeft,
-    description: "アプリ名、セクションの切り替え、どのセクションからも開けるお知らせをまとめたデモです。",
-    demo: <AppHeaderDemo />,
+    href: "#pattern-app-header", label: "通知ドロップダウン", icon: Bell,
+    description: "通知ボタンで未読件数を確認し、一覧を開いて既読にできます。",
+    source: "components/layout/NotificationDropdown.tsx", demo: <NotificationDemo />,
   },
   {
-    href: "#pattern-page-header",
-    label: "ページヘッダーと一覧ツールバー",
-    icon: LayoutList,
-    description: "パンくず、タイトル、主操作をページ上部に置き、一覧の検索と絞り込みをその下にまとめます。",
-    demo: <PageHeaderDemo />,
-  },
-  {
-    href: "#pattern-side-nav",
-    label: "サイドナビ",
-    icon: PanelLeft,
-    description: "現在地を強調し、関連する項目をグループにまとめます。狭い画面ではメニューを開いて移動できます。",
-    demo: <SideNavDemo />,
-  },
-  {
-    href: "#pattern-list-detail",
-    label: "一覧と詳細パネル",
-    icon: PanelRight,
-    description: "一覧から詳細を開きます。閉じると検索条件を保ったまま、元の項目に戻れます。",
-    demo: <ListDetailDemo />,
-  },
-  {
-    href: "#pattern-step-review",
-    label: "確認付きステップフォーム",
-    icon: Signpost,
-    description: "入力内容を確認してから申し込みます。確認画面から戻っても入力内容は保持されます。",
-    demo: <StepReviewDemo />,
+    href: "#pattern-side-nav", label: "折りたためるサイドナビ", icon: PanelLeft,
+    description: "サイドナビをアイコンだけの幅に切り替えられます。現在地の強調とサブメニューも確認できます。",
+    source: "components/layout/Sidebar.tsx", demo: <SideNavDemo />,
   },
 ];
 
 export function PatternPage({
-  pattern: { label, icon: Icon, description, demo },
+  pattern: { label, icon: Icon, description, demo, source },
 }: {
   pattern: (typeof patterns)[number];
 }) {
@@ -112,6 +69,7 @@ export function PatternPage({
         <p>{description}</p>
       </header>
       {demo}
+      <a className="source-link mt-5" href={sourceUrl(source)}>SolvifAI本体の実装元（権限が必要）</a>
     </div>
   );
 }

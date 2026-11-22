@@ -79,8 +79,8 @@ export function Tabs<Value extends string>({
               className={cn(
                 "rounded-lg px-3 py-1.5 text-sm transition-colors sm:px-5",
                 selected
-                  ? "bg-white font-medium text-brand-foreground shadow-sm"
-                  : "text-text-muted enabled:hover:text-text-primary",
+                  ? "bg-white font-medium text-brand-primary shadow-sm"
+                  : "text-text-secondary enabled:hover:text-text-primary",
                 "disabled:cursor-not-allowed disabled:opacity-50",
               )}
             >

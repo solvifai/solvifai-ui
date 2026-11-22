@@ -8,7 +8,7 @@ export function TextArea({ className, rows = 3, ...props }: ComponentPropsWithRe
       {...props}
       rows={rows}
       className={cn(
-        "min-w-0 w-full resize-y rounded-lg border border-border-control bg-white px-3 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:border-brand-primary read-only:bg-product-bg aria-invalid:border-rose-500 aria-invalid:focus-visible:outline-rose-500 disabled:cursor-not-allowed disabled:bg-product-bg",
+        "min-w-0 w-full resize-y rounded-lg border border-border-control bg-white px-3 py-2.5 text-sm text-text-primary outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary aria-invalid:border-rose-500",
         className,
       )}
     />

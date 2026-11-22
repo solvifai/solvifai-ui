@@ -1,8 +1,6 @@
-import { ArrowDown, ArrowLeft, ArrowUp, FileText, Plus } from "lucide-react";
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { ArrowLeft, FileText, Plus } from "lucide-react";
+import { useId, useLayoutEffect, useRef, useState } from "react";
 
-import { Accordion } from "../ui/Accordion";
-import { AlertBanner } from "../ui/AlertBanner";
 import { AppButton } from "../ui/AppButton";
 import { AvatarGroup, type AvatarGroupMember } from "../ui/AvatarGroup";
 import { Badge } from "../ui/Badge";
@@ -17,16 +15,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/Dialog";
-import { Drawer } from "../ui/Drawer";
 import { SimpleEmptyState } from "../ui/EmptyState";
 import { FileChipList, type SelectedFile } from "../ui/FileChipList";
-import { FileUpload } from "../ui/FileUpload";
 import { FileTypeIcon } from "../ui/FileTypeIcon";
+import { FileDropzone } from "../ui/FileDropzone";
+import { QueryError } from "../ui/QueryError";
+import { SlideGenerationProgress } from "../ui/SlideGenerationProgress";
 import { FormField } from "../ui/FormField";
-import { CheckIcon, CopyIcon, EyeIcon, EyeOffIcon, SidebarIcon, TrashIcon } from "../ui/icons";
+import { CheckIcon, CopyIcon, TrashIcon } from "../ui/icons";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 import { OptionGroup, type OptionGroupOption } from "../ui/OptionGroup";
-import { ProgressBar } from "../ui/ProgressBar";
 import { Radio } from "../ui/Radio";
 import { ResizeDivider } from "../ui/ResizeDivider";
 import { RowActionMenu } from "../ui/RowActionMenu";
@@ -34,16 +32,13 @@ import { SaveStatusIndicator, type SaveStatus } from "../ui/SaveStatusIndicator"
 import { SearchInput } from "../ui/SearchInput";
 import { SelectBox, type SelectBoxOption } from "../ui/SelectBox";
 import { Step, SteppedForm } from "../ui/SteppedForm";
-import { Table } from "../ui/Table";
 import { Tabs, type TabItem } from "../ui/Tabs";
 import { TablePagination } from "../ui/TablePagination";
 import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
-import { Skeleton } from "../ui/Skeleton";
 import { TextArea } from "../ui/TextArea";
 import { TextInput } from "../ui/TextInput";
 import { AppToaster, toast } from "../ui/Toast";
 import { Toggle } from "../ui/Toggle";
-import { Tooltip } from "../ui/Tooltip";
 
 function ButtonPreview() {
   const [status, setStatus] = useState("");
@@ -75,9 +70,7 @@ function ButtonPreview() {
 function TextPreview() {
   const [value, setValue] = useState("");
   const [title, setTitle] = useState("月次レポート");
-  const [email, setEmail] = useState("sample");
   const id = useId();
-  const invalid = !email.includes("@");
   return (
     <div className="demo-form">
       <FormField label="プロジェクト名" htmlFor={id + "-name"}>
@@ -85,20 +78,6 @@ function TextPreview() {
       </FormField>
       <FormField label="資料名" htmlFor={id + "-title"}>
         <TextInput id={id + "-title"} value={title} onChange={setTitle} />
-      </FormField>
-      <FormField label="メールアドレス" htmlFor={id + "-email"}>
-        <TextInput
-          id={id + "-email"}
-          value={email}
-          onChange={setEmail}
-          invalid={invalid}
-          describedBy={invalid ? id + "-error" : undefined}
-        />
-        {invalid ? (
-          <p id={id + "-error"} className="demo-error">
-            メールアドレスに @ を含めてください。
-          </p>
-        ) : null}
       </FormField>
       <FormField label="作成者" htmlFor={id + "-owner"}>
         <TextInput id={id + "-owner"} value="山田 花子" disabled />
@@ -144,55 +123,17 @@ const sortOptions = [
   { value: "oldest", label: "古い順" },
   { value: "name", label: "名前順" },
 ] satisfies SelectBoxOption[];
-const viewOptions = [
-  { value: "list", label: "一覧" },
-  { value: "grid", label: "グリッド" },
-] satisfies SelectBoxOption[];
-const categoryOptions = [
-  { value: "report", label: "レポート" },
-  { value: "minutes", label: "議事録" },
-] satisfies SelectBoxOption[];
-const permissionOptions = [{ value: "read", label: "閲覧のみ" }] satisfies SelectBoxOption[];
-
 function SelectBoxPreview() {
-  const [sort, setSort] = useState("");
-  const [view, setView] = useState("list");
-  const [category, setCategory] = useState("");
+  const [sort, setSort] = useState("recent");
   const id = useId();
-  const invalid = category === "";
 
   return (
     <div className="demo-form">
-      <FormField label="並び順" htmlFor={id + "-sort"}>
-        <SelectBox id={id + "-sort"} options={sortOptions} value={sort} onChange={setSort} />
+      <FormField label="並び順" htmlFor={id}>
+        <SelectBox id={id} options={sortOptions} value={sort} onChange={setSort} />
       </FormField>
-      <FormField label="表示形式" htmlFor={id + "-view"}>
-        <SelectBox id={id + "-view"} options={viewOptions} value={view} onChange={setView} />
-      </FormField>
-      <FormField label="カテゴリ（必須）" htmlFor={id + "-category"}>
-        <SelectBox
-          id={id + "-category"}
-          options={categoryOptions}
-          value={category}
-          onChange={setCategory}
-          invalid={invalid}
-          describedBy={invalid ? id + "-error" : undefined}
-          required
-        />
-        {invalid ? (
-          <p id={id + "-error"} className="demo-error">
-            カテゴリを選択してください。
-          </p>
-        ) : null}
-      </FormField>
-      <FormField label="アクセス権限" htmlFor={id + "-permission"}>
-        <SelectBox
-          id={id + "-permission"}
-          options={permissionOptions}
-          value="read"
-          onChange={() => {}}
-          disabled
-        />
+      <FormField label="変更できない例" htmlFor={id + "-disabled"}>
+        <SelectBox id={id + "-disabled"} options={sortOptions} value="name" onChange={() => {}} disabled />
       </FormField>
     </div>
   );
@@ -370,81 +311,6 @@ function PaginationPreview() {
   );
 }
 
-const previewRows = [
-  { id: 1, name: "月次レポート", updated: "11/18", status: "完了" },
-  { id: 2, name: "提案書", updated: "11/15", status: "確認中" },
-  { id: 3, name: "定例会の議事録", updated: "11/12", status: "完了" },
-];
-
-function TablePreview() {
-  const [order, setOrder] = useState<"ascending" | "descending">("descending");
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [empty, setEmpty] = useState(false);
-  const rows = order === "descending" ? previewRows : [...previewRows].reverse();
-  const SortIcon = order === "descending" ? ArrowDown : ArrowUp;
-
-  return (
-    <div className="grid w-full max-w-lg gap-3">
-      <div className="overflow-x-auto rounded-lg border border-catalog-line bg-white">
-        <Table aria-label="資料一覧の例">
-          <thead>
-            <tr>
-              <th scope="col" className="w-9">
-                <span className="sr-only">行選択</span>
-              </th>
-              <th scope="col">資料名</th>
-              <th scope="col" aria-sort={order}>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1 rounded"
-                  onClick={() => setOrder(order === "descending" ? "ascending" : "descending")}
-                >
-                  更新日
-                  <SortIcon size={13} aria-hidden="true" />
-                </button>
-              </th>
-              <th scope="col">状態</th>
-            </tr>
-          </thead>
-          <tbody>
-            {empty ? (
-              <tr>
-                <td colSpan={4}>
-                  <SimpleEmptyState message="資料がありません" />
-                </td>
-              </tr>
-            ) : (
-              rows.map((row) => (
-                <tr key={row.id} data-selected={selectedId === row.id || undefined}>
-                  <td>
-                    <Checkbox
-                      checked={selectedId === row.id}
-                      onChange={() => setSelectedId(selectedId === row.id ? null : row.id)}
-                      ariaLabel={`${row.name}を選択`}
-                    />
-                  </td>
-                  <th scope="row" className="font-medium">
-                    {row.name}
-                  </th>
-                  <td>{row.updated}</td>
-                  <td>
-                    <Badge label={row.status} color={row.status === "完了" ? "green" : "blue"} />
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </Table>
-      </div>
-      <div>
-        <AppButton variant="back" onClick={() => setEmpty(!empty)}>
-          {empty ? "サンプル行を表示" : "0件を表示"}
-        </AppButton>
-      </div>
-    </div>
-  );
-}
-
 const attachmentFiles: readonly SelectedFile[] = [
   { id: "a", name: "月次レポート.xlsx", source: "local" },
   { id: "b", name: "共有用_下期事業計画と各チームの重要アクション一覧.docx", source: "document" },
@@ -479,10 +345,10 @@ function FileChipListPreview() {
 
 const demoMembers: readonly AvatarGroupMember[] = [
   { id: 1, name: "SolvifAI サポート", icon_path: import.meta.env.BASE_URL + "favicon.png" },
-  { id: 2, name: "田中 花子" },
-  { id: 3, name: "佐藤 直樹" },
-  { id: 4, name: "伊藤 彩" },
-  { id: 5, name: "鈴木 亮" },
+  { id: 2, name: "田中 花子", icon_path: "/img/icon/user.svg" },
+  { id: 3, name: "佐藤 直樹", icon_path: "/img/icon/user.svg" },
+  { id: 4, name: "伊藤 彩", icon_path: "/img/icon/user.svg" },
+  { id: 5, name: "鈴木 亮", icon_path: "/img/icon/user.svg" },
 ];
 
 function AvatarGroupPreview() {
@@ -506,6 +372,7 @@ function AvatarGroupPreview() {
 
 const saveStates: readonly { value: SaveStatus; label: string }[] = [
   { value: "idle", label: "待機中" },
+  { value: "unsaved", label: "未保存" },
   { value: "saving", label: "保存中" },
   { value: "saved", label: "保存済み" },
   { value: "error", label: "失敗" },
@@ -517,11 +384,6 @@ function SaveStatusPreview() {
     <div className="grid w-full max-w-sm gap-3">
       <div className="flex min-h-14 flex-wrap items-center justify-between gap-2 rounded-lg border border-catalog-line bg-white px-3 py-2">
         <SaveStatusIndicator status={status} />
-        {status === "error" ? (
-          <AppButton variant="back" className="h-8" onClick={() => setStatus("saved")}>
-            再試行
-          </AppButton>
-        ) : null}
       </div>
       <div role="group" aria-label="保存状態を切り替える" className="flex flex-wrap gap-2">
         {saveStates.map(({ value, label }) => (
@@ -575,12 +437,12 @@ function TabFiles({ files }: { files: readonly string[] }) {
 const documentTabs: readonly TabItem<DocumentTab>[] = [
   {
     value: "individual",
-    label: "PJ個別データ",
+    label: "グループ内",
     panel: <TabFiles files={["月次レポート.xlsx", "プロジェクト計画書.docx"]} />,
   },
   {
     value: "shared",
-    label: "全体共通データ",
+    label: "全体",
     panel: <TabFiles files={["社内ガイドライン.pdf", "提案書テンプレート.pptx"]} />,
   },
   {
@@ -633,40 +495,6 @@ function ToastPreview() {
   );
 }
 
-function TooltipPreview() {
-  const [highlighted, setHighlighted] = useState(false);
-  const buttonClass =
-    "inline-flex size-10 items-center justify-center rounded-lg border border-catalog-line bg-white hover:bg-slate-50 aria-pressed:text-brand-foreground";
-
-  return (
-    <div className="grid justify-items-center gap-3">
-      <div className="demo-row">
-        <Tooltip content={highlighted ? "作成理由ハイライトを非表示" : "作成理由ハイライトを表示"}>
-          <button
-            type="button"
-            aria-label="作成理由ハイライト"
-            aria-pressed={highlighted}
-            className={buttonClass}
-            onClick={() => setHighlighted(!highlighted)}
-          >
-            {highlighted ? <EyeIcon /> : <EyeOffIcon />}
-          </button>
-        </Tooltip>
-        <Tooltip content="設定中の共有範囲を確認できます" side="top">
-          <button type="button" className={buttonClass} aria-label="共有範囲の補足">
-            <span aria-hidden="true" className="font-bold text-catalog-muted">
-              ?
-            </span>
-          </button>
-        </Tooltip>
-      </div>
-      <p className="text-center text-xs text-catalog-muted">
-        ホバーまたはフォーカスで説明を表示できます。
-      </p>
-    </div>
-  );
-}
-
 function RadioPreview() {
   const name = useId();
   const [category, setCategory] = useState("project");
@@ -677,14 +505,14 @@ function RadioPreview() {
       <Radio
         name={name}
         value="project"
-        label="PJ個別データ"
+        label="グループ内"
         checked={category === "project"}
         onChange={(event) => setCategory(event.currentTarget.value)}
       />
       <Radio
         name={name}
         value="shared"
-        label="全体共有データ"
+        label="全体"
         checked={category === "shared"}
         onChange={(event) => setCategory(event.currentTarget.value)}
       />
@@ -716,42 +544,22 @@ function TogglePreview() {
   );
 }
 
-function AccordionPreview() {
-  return (
-    <div className="grid w-full max-w-lg gap-2">
-      <Accordion heading="構成を確認する" open>
-        <p>目次の見出しと順序を確認します。</p>
-      </Accordion>
-      <Accordion heading="データの整合性を確認する">
-        <p>表の数値や単位を、参照資料と照合します。</p>
-      </Accordion>
-      <Accordion heading="表記を整える">
-        <p>固有名詞や表記の揺れを確認します。</p>
-      </Accordion>
-    </div>
-  );
-}
-
 function FileUploadPreview() {
-  const [files, setFiles] = useState<SelectedFile[]>([]);
+  const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
   return (
-    <div className="grid w-full max-w-md gap-3">
-      <FileUpload
-        accept=".pptx"
-        hint="PPTXファイルのみ対応"
-        onFiles={(selected) =>
-          setFiles(
-            selected.map((file) => ({ id: file.name, name: file.name, file, source: "local" })),
-          )
-        }
-      />
-      <FileChipList
-        files={files}
-        onRemove={(id) => setFiles((previous) => previous.filter((file) => file.id !== id))}
-      />
-      <p className="text-xs text-text-muted">
-        選んだファイルはこのプレビュー内だけで表示されます。
-      </p>
+    <div className="w-full max-w-md">
+      <FileDropzone file={file} error={error} accept=".pptx"
+        hint="PPTXファイルを選択してください"
+        onSelect={(selected) => {
+          if (!selected.name.toLowerCase().endsWith(".pptx")) {
+            setError("PPTX形式のファイルを選択してください。");
+            return;
+          }
+          setError(null);
+          setFile(selected);
+        }}
+        onClear={() => { setFile(null); setError(null); }} />
     </div>
   );
 }
@@ -762,7 +570,7 @@ function ProgressBarPreview() {
 
   return (
     <div className="grid w-full max-w-md gap-3">
-      <ProgressBar label={progress === 100 ? "生成完了" : "スライド生成中"} progress={progress} />
+      <SlideGenerationProgress label={progress === 100 ? "生成完了" : "スライド生成中"} progress={progress} />
       <label htmlFor={id} className="text-xs font-medium text-text-muted">
         サンプルの進捗を変更
       </label>
@@ -793,7 +601,7 @@ function SteppedFormPreview() {
   return (
     <SteppedForm className="w-full max-w-md">
       <Step title="基本情報" complete={name.trim().length > 0}>
-        <FormField label="成果物資料名" htmlFor={id + "-name"}>
+        <FormField label="タイトル" htmlFor={id + "-name"}>
           <TextInput
             id={id + "-name"}
             value={name}
@@ -802,8 +610,8 @@ function SteppedFormPreview() {
           />
         </FormField>
       </Step>
-      <Step title="フォーマット" complete={format !== ""}>
-        <FormField label="フォーマットを選ぶ" htmlFor={id + "-format"}>
+      <Step title="用紙" complete={format !== ""}>
+        <FormField label="用紙を選ぶ" htmlFor={id + "-format"}>
           <SelectBox
             id={id + "-format"}
             value={format}
@@ -812,14 +620,14 @@ function SteppedFormPreview() {
           />
         </FormField>
       </Step>
-      <Step title="ドラフト目次" complete={outline}>
+      <Step title="入力内容の確認" complete={outline}>
         <div className="flex items-center gap-2 text-sm">
           <Checkbox
             checked={outline}
             onChange={() => setOutline(!outline)}
-            ariaLabel="目次を確認しました"
+            ariaLabel="入力内容を確認しました"
           />
-          <span>目次を確認しました</span>
+          <span>入力内容を確認しました</span>
         </div>
       </Step>
     </SteppedForm>
@@ -886,7 +694,6 @@ function DateRangePickerPreview({ kind }: { kind: "date" | "datetime" }) {
   const errorId = id + "-error";
   const invalid = Boolean(start && end && end < start);
   const endDescription = [zoneId, invalid ? errorId : undefined].filter(Boolean).join(" ");
-  const timeZone = withTime ? "Asia/Tokyo" : undefined;
 
   return (
     <div className="grid w-full max-w-lg gap-3">
@@ -901,8 +708,7 @@ function DateRangePickerPreview({ kind }: { kind: "date" | "datetime" }) {
             id={id + "-start"}
             value={start}
             aria-describedby={zoneId}
-            timeZone={timeZone}
-            onChange={setStart}
+            onChange={(event) => setStart(event.currentTarget.value)}
           />
         </FormField>
         <FormField label={"終了" + unit} htmlFor={id + "-end"}>
@@ -912,8 +718,7 @@ function DateRangePickerPreview({ kind }: { kind: "date" | "datetime" }) {
             value={end}
             aria-invalid={invalid || undefined}
             aria-describedby={endDescription || undefined}
-            timeZone={timeZone}
-            onChange={setEnd}
+            onChange={(event) => setEnd(event.currentTarget.value)}
           />
           {invalid ? (
             <p id={errorId} className="demo-error">
@@ -938,7 +743,6 @@ function ResizePanelPreview() {
   const container = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(520);
   const [requestedWidth, setRequestedWidth] = useState<number | null>(null);
-  const panelId = useId();
 
   useLayoutEffect(() => {
     const element = container.current;
@@ -965,7 +769,6 @@ function ResizePanelPreview() {
         className="flex h-52 overflow-hidden rounded-lg border border-catalog-line bg-white"
       >
         <aside
-          id={panelId}
           style={{ width }}
           className="shrink-0 overflow-y-auto bg-product-bg p-2"
         >
@@ -982,11 +785,6 @@ function ResizePanelPreview() {
         </aside>
         <ResizeDivider
           position="left"
-          ariaLabel="スライド一覧の幅を調整"
-          controls={panelId}
-          value={width}
-          min={min}
-          max={max}
           onResize={(delta) =>
             setRequestedWidth((previous) => clampWidth(clampWidth(previous ?? initial) + delta))
           }
@@ -1015,120 +813,14 @@ function ResizePanelPreview() {
   );
 }
 
-function AlertBannerPreview() {
-  const [state, setState] = useState<"error" | "retrying" | "fetched">("error");
-
-  useEffect(() => {
-    if (state !== "retrying") return;
-    const timer = window.setTimeout(() => setState("fetched"), 650);
-    return () => window.clearTimeout(timer);
-  }, [state]);
-
-  return (
-    <div className="grid w-full max-w-lg gap-3">
-      {state === "fetched" ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
-          <p role="status">最新情報を取得しました。</p>
-          <AppButton variant="back" onClick={() => setState("error")}>
-            エラーを再表示
-          </AppButton>
-        </div>
-      ) : (
-        <AlertBanner
-          action={
-            <AppButton
-              className="!px-5"
-              disabled={state === "retrying"}
-              onClick={() => setState("retrying")}
-            >
-              {state === "retrying" ? "再取得中…" : "再取得"}
-            </AppButton>
-          }
-        >
-          最新情報を取得できませんでした。入力内容は保持しています。再取得してから保存してください。
-        </AlertBanner>
-      )}
-      <AlertBanner tone="warning">AIテキストの出力範囲は編集できません。</AlertBanner>
-    </div>
-  );
-}
-
-function SkeletonPreview() {
-  const [drafting, setDrafting] = useState(true);
-
-  return (
-    <div className="grid w-full max-w-md justify-items-start gap-3">
-      <div className="grid min-h-40 w-full content-center rounded-lg border border-catalog-line bg-white">
-        {drafting ? (
-          <Skeleton label="修正案作成中…" />
-        ) : (
-          <div className="grid gap-2 p-4 text-sm">
-            <p role="status" className="font-semibold text-catalog-ink">
-              修正案を作成しました
-            </p>
-            <p className="text-catalog-muted">
-              次月は問い合わせ対応時間を短縮するため、よくある質問を整理します。
-            </p>
-          </div>
-        )}
-      </div>
-      <AppButton variant="back" onClick={() => setDrafting(!drafting)}>
-        {drafting ? "作成結果を表示" : "作成中を表示"}
-      </AppButton>
-    </div>
-  );
-}
-
-function DrawerPreview() {
-  const id = useId();
-  const trigger = useRef<HTMLButtonElement>(null);
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="grid w-full max-w-xl justify-items-start gap-3">
-      <AppButton
-        ref={trigger}
-        variant="back"
-        iconLeft={<SidebarIcon />}
-        aria-controls={id}
-        aria-expanded={open}
-        onClick={() => setOpen(!open)}
-      >
-        {open ? "履歴を閉じる" : "履歴を開く"}
-      </AppButton>
-      <div className="flex min-h-48 w-full gap-2 rounded-lg border border-catalog-line bg-product-bg p-2">
-        <section className="min-w-0 flex-1 rounded-lg border border-catalog-line bg-white p-2.5">
-          <p className="mb-4 text-xs font-semibold">編集エリア</p>
-          <p className="text-sm font-medium">月次レポート</p>
-          <p className="mt-2 text-xs text-catalog-muted">今月の進捗と次月の予定</p>
-        </section>
-        <Drawer
-          id={id}
-          title="バージョン履歴"
-          open={open}
-          onClose={() => {
-            setOpen(false);
-            trigger.current?.focus();
-          }}
-        >
-          <ul className="grid gap-2 p-2 text-xs">
-            <li className="grid gap-1 rounded-lg border border-blue-200 bg-blue-50 p-2">
-              <strong className="text-catalog-ink">v2 · 最新版</strong>
-              <time className="text-catalog-muted" dateTime="2026-11-19T10:30">
-                11月19日 10:30
-              </time>
-            </li>
-            <li className="grid gap-1 rounded-lg border border-gray-200 p-2">
-              <strong className="text-catalog-ink">v1</strong>
-              <time className="text-catalog-muted" dateTime="2026-11-18T16:45">
-                11月18日 16:45
-              </time>
-            </li>
-          </ul>
-        </Drawer>
-      </div>
-    </div>
-  );
+function QueryErrorPreview() {
+  const [failed, setFailed] = useState(true);
+  return failed
+    ? <QueryError error={new Error("サンプルを読み込めませんでした。")} retry={() => setFailed(false)} />
+    : <div className="grid gap-2">
+        <p role="status">再読み込みしました。</p>
+        <AppButton variant="back" onClick={() => setFailed(true)}>最初から試す</AppButton>
+      </div>;
 }
 
 export const previews = {
@@ -1143,17 +835,14 @@ export const previews = {
   "empty-state": EmptyPreview,
   "row-action-menu": RowActionMenuPreview,
   "table-pagination": PaginationPreview,
-  table: TablePreview,
   "file-chip-list": FileChipListPreview,
   "avatar-group": AvatarGroupPreview,
   "save-status-indicator": SaveStatusPreview,
   "option-group": OptionGroupPreview,
   tabs: TabsPreview,
   toast: ToastPreview,
-  tooltip: TooltipPreview,
   radio: RadioPreview,
   toggle: TogglePreview,
-  accordion: AccordionPreview,
   "file-upload": FileUploadPreview,
   "progress-bar": ProgressBarPreview,
   "stepped-form": SteppedFormPreview,
@@ -1161,9 +850,7 @@ export const previews = {
   "date-picker": DatePickerPreview,
   "date-time-picker": DateTimePickerPreview,
   "resizable-panel": ResizePanelPreview,
-  "alert-banner": AlertBannerPreview,
-  skeleton: SkeletonPreview,
-  drawer: DrawerPreview,
+  "alert-banner": QueryErrorPreview,
   breadcrumb: BreadcrumbPreview,
 };
 
@@ -1256,27 +943,6 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
           <TablePagination page={1} perPage={5} total={13} onPageChange={() => {}} />
         </div>
       );
-    case "table":
-      return (
-        <div className="w-full overflow-hidden rounded-lg border border-catalog-line bg-white">
-          <Table className="text-xs" aria-label="テーブルの例">
-            <thead>
-              <tr>
-                <th scope="col">資料名</th>
-                <th scope="col">更新日</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr data-selected="true">
-                <th scope="row" className="font-medium">
-                  月次レポート
-                </th>
-                <td>11/18</td>
-              </tr>
-            </tbody>
-          </Table>
-        </div>
-      );
     case "file-chip-list":
       return <FileChipList files={attachmentFiles.slice(0, 1)} onRemove={() => {}} />;
     case "avatar-group":
@@ -1313,22 +979,11 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
           フォルダを作成しました
         </div>
       );
-    case "tooltip":
-      return (
-        <div className="grid justify-items-center gap-1.5">
-          <span className="grid size-8 place-items-center rounded-md border border-catalog-line bg-white">
-            <EyeIcon />
-          </span>
-          <span className="rounded bg-gray-900 px-2 py-1 text-xs text-white">
-            作成理由ハイライトを表示
-          </span>
-        </div>
-      );
     case "radio":
       return (
         <div className="grid w-fit max-w-full gap-1.5">
-          <Radio label="PJ個別データ" defaultChecked className="bg-white py-2" />
-          <Radio label="全体共有データ" className="bg-white py-2" />
+          <Radio label="グループ内" defaultChecked className="bg-white py-2" />
+          <Radio label="全体" className="bg-white py-2" />
         </div>
       );
     case "toggle":
@@ -1338,29 +993,15 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
           <Toggle ariaLabel="高精度" checked onChange={() => {}} />
         </div>
       );
-    case "accordion":
-      return (
-        <div className="grid w-full max-w-48 gap-1.5">
-          <Accordion heading="構成を確認する" />
-          <Accordion heading="表記を整える" />
-        </div>
-      );
     case "file-upload":
-      return (
-        <FileUpload
-          accept=".pptx"
-          hint="PPTXファイルのみ対応"
-          onFiles={() => {}}
-          className="w-full [&_button]:min-h-0 [&_button]:gap-1 [&_button]:p-2 [&_button]:text-xs [&_svg]:size-5"
-        />
-      );
+      return <AppButton variant="back">ファイルを選択</AppButton>;
     case "progress-bar":
-      return <ProgressBar label="スライド生成中" progress={45} className="w-full max-w-60" />;
+      return <SlideGenerationProgress label="処理中" progress={45} />;
     case "stepped-form":
       return (
-        <SteppedForm className="w-full max-w-60 [&_li>button]:min-h-8 [&_li>div]:hidden">
-          <Step title="基本情報" complete />
-          <Step title="フォーマット" complete={false} />
+        <SteppedForm className="w-full max-w-60 gap-1 [&_button]:h-8">
+          <Step title="基本情報" complete>{null}</Step>
+          <Step title="用紙" complete={false}>{null}</Step>
         </SteppedForm>
       );
     case "text-area":
@@ -1389,10 +1030,6 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
           <span className="grid flex-1 place-items-center bg-product-bg">一覧</span>
           <ResizeDivider
             position="left"
-            ariaLabel="一覧の幅"
-            value={80}
-            min={60}
-            max={150}
             onResize={() => {}}
           />
           <span className="grid flex-2 place-items-center">編集</span>
@@ -1406,28 +1043,7 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
       );
     case "alert-banner":
       return (
-        <AlertBanner className="px-3 py-2 text-xs">最新情報を取得できませんでした。</AlertBanner>
-      );
-    case "skeleton":
-      return (
-        <Skeleton label="修正案作成中…" className="min-h-0 gap-1.5 p-0 [&_svg]:h-7 [&_svg]:w-8" />
-      );
-    case "drawer":
-      return (
-        <div className="flex w-full max-w-60 gap-1.5 rounded-lg border border-catalog-line bg-product-bg p-1.5">
-          <span className="grid min-w-0 flex-1 place-items-center rounded border border-catalog-line bg-white text-xs">
-            編集エリア
-          </span>
-          <Drawer
-            id="drawer-card-panel"
-            title="バージョン履歴"
-            open
-            onClose={() => {}}
-            className="w-[60%] [&_button]:size-7"
-          >
-            <p className="p-2 text-xs text-catalog-muted">v2 · 最新版</p>
-          </Drawer>
-        </div>
+        <QueryError error={new Error("サンプルを取得できませんでした。")} retry={() => {}} />
       );
   }
 }

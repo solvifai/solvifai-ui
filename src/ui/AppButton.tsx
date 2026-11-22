@@ -9,11 +9,11 @@ export interface AppButtonProps extends ComponentPropsWithRef<"button"> {
 }
 
 const base =
-  "inline-flex items-center justify-center h-10 whitespace-nowrap text-sm font-sans font-medium cursor-pointer transition-opacity enabled:hover:brightness-95";
+  "inline-flex items-center justify-center h-10 whitespace-nowrap text-sm font-sans font-medium cursor-pointer transition-opacity";
 
 const variants: Record<NonNullable<AppButtonProps["variant"]>, string> = {
-  primary: "bg-brand-action-gradient text-white rounded border-0 px-10 gap-2",
-  secondary: "bg-white text-brand-foreground border border-brand-primary rounded-sm px-10 gap-3.5",
+  primary: "bg-brand-gradient text-white rounded border-0 px-10 gap-2",
+  secondary: "bg-white text-brand-primary border border-brand-primary rounded-sm px-10 gap-3.5",
   back: "bg-white text-text-primary border border-border-secondary rounded-lg px-3 gap-3.5",
 };
 

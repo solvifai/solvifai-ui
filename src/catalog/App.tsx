@@ -26,6 +26,7 @@ import guideUrl from "./guidelines.md?url&no-inline";
 import { brandSymbolUrl, Icons } from "./Icons";
 import { PatternPage, patterns } from "./Patterns";
 import { CardPreview, HeroPreview, previews } from "./previews";
+import { sourceUrl } from "./sources";
 
 const repository = "https://github.com/solvifai/solvifai-ui";
 const categoryLinks = {
@@ -271,18 +272,13 @@ function Detail({ entry }: { entry: ComponentEntry }) {
           </pre>
         </div>
         <a className="source-link" href={repository + "/blob/main/src/ui/" + entry.file}>
-          実装をGitHubで見る
+          切り出した実装をGitHubで見る
           <ArrowUpRight size={15} />
         </a>
-      </section>
-      {entry.id === "table" ? (
         <div>
-          <a className="source-link" href="#file-list">
-            複数選択と一括削除を試す
-            <ArrowUpRight size={15} aria-hidden="true" />
-          </a>
+          <a className="source-link" href={sourceUrl(entry.source)}>SolvifAI本体の実装元（権限が必要）</a>
         </div>
-      ) : null}
+      </section>
       <a className="back-link" href="#components">
         <ArrowLeft size={16} />
         コンポーネント一覧へ

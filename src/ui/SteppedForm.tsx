@@ -1,100 +1,127 @@
 import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
   Children,
   isValidElement,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type ReactElement,
   type ReactNode,
-} from "react";
+} from 'react';
 
-import { cn } from "./cn";
-import { CheckIcon, ChevronDownIcon } from "./icons";
+import { ChevronDownIcon } from './icons';
 
 interface StepProps {
   title: string;
   complete: boolean;
-  children?: ReactNode;
+  children: ReactNode;
 }
 
 export function Step(_props: StepProps) {
   return null;
 }
 
-export function SteppedForm({ children, className }: { children: ReactNode; className?: string }) {
-  const id = useId();
-  const steps = Children.toArray(children).filter(
-    (child): child is ReactElement<StepProps> => isValidElement(child) && child.type === Step,
+interface SteppedFormProps {
+  children: ReactNode;
+  className?: string;
+}
+
+interface StepMeta {
+  index: number;
+  title: string;
+  complete: boolean;
+  content: ReactNode;
+}
+
+function extractSteps(children: ReactNode): StepMeta[] {
+  const steps: StepMeta[] = [];
+  let index = 0;
+  Children.forEach(children, (child) => {
+    if (isValidElement(child) && child.type === Step) {
+      const props = child.props as StepProps;
+      steps.push({
+        index,
+        title: props.title,
+        complete: props.complete,
+        content: props.children,
+      });
+      index++;
+    }
+  });
+  return steps;
+}
+
+export function SteppedForm({ children, className = '' }: SteppedFormProps) {
+  const steps = extractSteps(children);
+
+  const [openIndices, setOpenIndices] = useState<Set<number>>(
+    () => new Set(steps.length > 0 ? [0] : []),
   );
-  const completeSnapshot = steps.map(({ props }) => (props.complete ? "1" : "0")).join("");
-  const currentIndex = completeSnapshot.indexOf("0");
-  const previous = useRef("");
-  const [openIndices, setOpenIndices] = useState<Set<number>>(() => new Set([0]));
+
+  const stepsRef = useRef(steps);
+  stepsRef.current = steps;
+  const prevCompleteRef = useRef<Record<number, boolean>>({});
+
+  const completeSnapshot = useMemo(
+    () => steps.map((s) => s.complete).join(','),
+    [steps],
+  );
 
   useEffect(() => {
-    const toOpen = Array.from(completeSnapshot).flatMap((complete, index) =>
-      complete === "1" && previous.current[index] !== "1" && index + 1 < completeSnapshot.length
-        ? [index + 1]
-        : [],
+    const currentSteps = stepsRef.current;
+    const prev = prevCompleteRef.current;
+    for (let i = 0; i < currentSteps.length - 1; i++) {
+      if (currentSteps[i].complete && !prev[i]) {
+        setOpenIndices((s) => new Set(s).add(i + 1));
+      }
+    }
+    prevCompleteRef.current = Object.fromEntries(
+      currentSteps.map((s) => [s.index, s.complete]),
     );
-    previous.current = completeSnapshot;
-    if (toOpen.length > 0) setOpenIndices((open) => new Set([...open, ...toOpen]));
   }, [completeSnapshot]);
 
-  function toggle(index: number) {
-    setOpenIndices((open) => {
-      const next = new Set(open);
-      if (next.has(index)) next.delete(index);
-      else next.add(index);
+  const toggle = useCallback((idx: number) => {
+    setOpenIndices((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) {
+        next.delete(idx);
+      } else {
+        next.add(idx);
+      }
       return next;
     });
-  }
+  }, []);
 
   return (
-    <ol className={cn("grid gap-2", className)}>
-      {steps.map(({ key, props }, index) => {
-        const expanded = openIndices.has(index);
-        const buttonId = `${id}-step-${index}`;
-        const panelId = `${buttonId}-content`;
+    <div className={`flex flex-col gap-5 ${className}`}>
+      {steps.map((step) => {
+        const isOpen = openIndices.has(step.index);
         return (
-          <li key={key} className="rounded-lg border border-border-control bg-white">
+          <div
+            key={step.index}
+            className='rounded-lg bg-background-white shadow-card'
+          >
             <button
-              id={buttonId}
-              type="button"
-              aria-expanded={expanded}
-              aria-controls={panelId}
-              aria-current={index === currentIndex ? "step" : undefined}
-              onClick={() => toggle(index)}
-              className="flex min-h-12 w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium hover:bg-product-bg"
+              type='button'
+              aria-expanded={isOpen}
+              className='flex h-20 w-full cursor-pointer items-center gap-3 px-5 text-left select-none'
+              onClick={() => toggle(step.index)}
             >
               <span
-                aria-hidden="true"
-                className="grid size-5 shrink-0 place-items-center rounded-full bg-brand-gradient text-xs text-white"
-              >
-                {props.complete ? <CheckIcon className="size-3.5" /> : index + 1}
+                aria-hidden
+                className='size-2.5 shrink-0 rounded-full bg-brand-gradient opacity-70'
+              />
+              <span className='flex-1 text-base leading-none text-text-primary'>
+                {step.title}
               </span>
-              <span className="min-w-0 flex-1">{props.title}</span>
-              {props.complete ? <span className="text-xs text-emerald-700">完了</span> : null}
               <ChevronDownIcon
-                className={cn(
-                  "size-4 shrink-0 text-text-muted motion-safe:transition-transform",
-                  expanded && "rotate-180",
-                )}
+                className={`size-5 text-text-secondary transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
               />
             </button>
-            <div
-              id={panelId}
-              role="region"
-              aria-labelledby={buttonId}
-              hidden={!expanded}
-              className="px-3 pt-1 pb-3"
-            >
-              {props.children}
-            </div>
-          </li>
+            {isOpen && <div className='px-5 pt-4 pb-8'>{step.content}</div>}
+          </div>
         );
       })}
-    </ol>
+    </div>
   );
 }
