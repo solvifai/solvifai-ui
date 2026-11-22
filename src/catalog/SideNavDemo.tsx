@@ -9,6 +9,7 @@ const sections = [
   { label: "観察記録", icon: Binoculars },
   { label: "散歩先", icon: Compass },
 ];
+const observationItems = ["野鳥", "草花"];
 
 export function SideNavDemo() {
   const [expanded, setExpanded] = useState(false);
@@ -32,7 +33,10 @@ export function SideNavDemo() {
         <ul id="side-nav-demo-items" className="grid gap-2 pt-4">
           {sections.map(({ label, icon: Icon }) => (
             <li key={label}>
-              <MenuItemLink active={active === label} aria-label={label}
+              <MenuItemLink
+                active={active === label || (label === "観察記録" && (subOpen || observationItems.includes(active)))}
+                aria-current={active === label ? "page" : false}
+                aria-label={label}
                 ref={label === "観察記録" ? groupButton : undefined}
                 aria-expanded={label === "観察記録" ? subOpen : undefined}
                 aria-controls={label === "観察記録" && subOpen ? "side-nav-demo-group" : undefined}
@@ -40,8 +44,12 @@ export function SideNavDemo() {
                 prefix={<Icon size={20} className="shrink-0" aria-hidden="true" />}
                 className={expanded ? "gap-2 px-3 py-3" : "justify-center py-3"}
                 onClick={() => {
-                  setActive(label);
-                  setSubOpen(label === "観察記録" && !subOpen);
+                  if (label === "観察記録") {
+                    setSubOpen((open) => !open);
+                  } else {
+                    setActive(label);
+                    setSubOpen(false);
+                  }
                 }}>
                 {expanded && <span className="truncate text-sm">{label}</span>}
               </MenuItemLink>
@@ -59,7 +67,7 @@ export function SideNavDemo() {
                 groupButton.current?.focus();
               }}><X size={14} className="mx-auto" aria-hidden="true" /></button>
           </div>
-          {["野鳥", "草花"].map((label) => (
+          {observationItems.map((label) => (
             <MenuItemLink key={label} active={active === label}
               prefix={<span aria-hidden="true" className="size-2.5 shrink-0 rounded-full bg-brand-gradient opacity-70" />}
               className="gap-2 px-2 py-3 text-sm sm:px-5" onClick={() => setActive(label)}>

@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { AppButton } from "../ui/AppButton";
 import { AppToaster, toast } from "../ui/Toast";
 
-const accept = ".pdf,.pptx,.docx,.xlsx,.xls,.xlsm,.txt,.md,.c,image/*,audio/*,video/*";
+const accept = ".pdf,.pptx,.docx,.xlsx,.xls,.xlsm,.txt,.md,.c,.wav,.mp4,.mp3,.m4a,.opus,.ogg,.flac,.wma,.aac,.amr,.webm,.spx";
 const mb = 1024 * 1024;
 
 export function UploadDemo() {

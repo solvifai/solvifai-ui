@@ -6,6 +6,7 @@ import { AvatarGroup, type AvatarGroupMember } from "../ui/AvatarGroup";
 import { Badge } from "../ui/Badge";
 import { Checkbox } from "../ui/Checkbox";
 import { DatePicker, DateTimePicker } from "../ui/DatePicker";
+import { DateTimeRange } from "../ui/DateTimeRange";
 import {
   Dialog,
   DialogClose,
@@ -683,60 +684,35 @@ function TextAreaPreview() {
   );
 }
 
-function DateRangePickerPreview({ kind }: { kind: "date" | "datetime" }) {
-  const withTime = kind === "datetime";
-  const Picker = withTime ? DateTimePicker : DatePicker;
-  const [start, setStart] = useState(withTime ? "2026-11-19T09:00" : "2026-11-01");
-  const [end, setEnd] = useState(withTime ? "2026-11-19T18:00" : "");
+function DatePickerPreview() {
+  const [start, setStart] = useState("2026-11-01");
+  const [end, setEnd] = useState("");
   const id = useId();
-  const unit = withTime ? "日時" : "日";
-  const zoneId = withTime ? id + "-zone" : undefined;
   const errorId = id + "-error";
   const invalid = Boolean(start && end && end < start);
-  const endDescription = [zoneId, invalid ? errorId : undefined].filter(Boolean).join(" ");
 
   return (
-    <div className="grid w-full max-w-lg gap-3">
-      {zoneId ? (
-        <p id={zoneId} className="text-xs text-catalog-muted">
-          日本時間（JST）
-        </p>
-      ) : null}
-      <div className="grid gap-3 sm:grid-cols-2">
-        <FormField label={"開始" + unit} htmlFor={id + "-start"}>
-          <Picker
-            id={id + "-start"}
-            value={start}
-            aria-describedby={zoneId}
-            onChange={(event) => setStart(event.currentTarget.value)}
-          />
-        </FormField>
-        <FormField label={"終了" + unit} htmlFor={id + "-end"}>
-          <Picker
-            id={id + "-end"}
-            min={start || undefined}
-            value={end}
-            aria-invalid={invalid || undefined}
-            aria-describedby={endDescription || undefined}
-            onChange={(event) => setEnd(event.currentTarget.value)}
-          />
-          {invalid ? (
-            <p id={errorId} className="demo-error">
-              終了{unit}は開始{unit}以降を選んでください。
-            </p>
-          ) : null}
-        </FormField>
-      </div>
+    <div className="grid w-full max-w-lg gap-3 sm:grid-cols-2">
+      <FormField label="開始日" htmlFor={id + "-start"}>
+        <DatePicker id={id + "-start"} value={start}
+          onChange={(event) => setStart(event.currentTarget.value)} />
+      </FormField>
+      <FormField label="終了日" htmlFor={id + "-end"}>
+        <DatePicker id={id + "-end"} min={start || undefined} value={end}
+          aria-invalid={invalid || undefined} aria-describedby={invalid ? errorId : undefined}
+          onChange={(event) => setEnd(event.currentTarget.value)} />
+        {invalid && <p id={errorId} className="demo-error">終了日は開始日以降を選んでください。</p>}
+      </FormField>
     </div>
   );
 }
 
-function DatePickerPreview() {
-  return <DateRangePickerPreview kind="date" />;
-}
-
 function DateTimePickerPreview() {
-  return <DateRangePickerPreview kind="datetime" />;
+  const [range, setRange] = useState({
+    startAt: "2026-11-19T09:00",
+    endAt: "2026-11-19T18:00",
+  });
+  return <DateTimeRange value={range} onChange={setRange} />;
 }
 
 function ResizePanelPreview() {

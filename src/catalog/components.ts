@@ -631,20 +631,19 @@ import { TextArea } from "./ui/TextArea";
   {
     id: "date-time-picker",
     source: "routes/settings/log-info.tsx",
-    name: "DateTimePicker",
+    name: "DateTimeRange",
     label: "日時ピッカー",
     category: "入力",
     icon: CalendarClock,
     description: "ブラウザ標準の日時入力で、開始と終了を分単位で指定します。",
     guidance: [
-      "値は YYYY-MM-DDTHH:mm 形式です。使用するタイムゾーンは画面に明示し、変換は呼び出し側で行います。",
+      "値は日本時間の YYYY-MM-DDTHH:mm 形式です。未来の日時を制限し、開始と終了が逆転するともう一方を1分ずらします。",
     ],
-    variants: ["ブラウザ標準", "分単位"],
-    file: "DatePicker.tsx",
-    code: `import { DateTimePicker } from "./ui/DatePicker";
+    variants: ["ブラウザ標準", "分単位", "日時の上限"],
+    file: "DateTimeRange.tsx",
+    code: `import { DateTimeRange } from "./ui/DateTimeRange";
 
-<DateTimePicker aria-label="終了日時（日本時間）"
-  value={endAt} onChange={(event) => setEndAt(event.currentTarget.value)} />`,
+<DateTimeRange value={range} onChange={setRange} />`,
   },
   {
     id: "resizable-panel",
