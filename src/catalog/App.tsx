@@ -1,5 +1,4 @@
 import {
-  ArrowDown,
   ArrowDownRight,
   ArrowLeft,
   ArrowRight,
@@ -26,7 +25,7 @@ import guide from "./guidelines.md?raw";
 import guideUrl from "./guidelines.md?url&no-inline";
 import { brandSymbolUrl, Icons } from "./Icons";
 import { PatternPage, patterns } from "./Patterns";
-import { CardPreview, HeroPreview, previews } from "./previews";
+import { CardPreview, previews } from "./previews";
 import { sourceUrl } from "./sources";
 
 const repository = "https://github.com/solvifai/solvifai-ui";
@@ -121,94 +120,67 @@ function Catalog({ category }: { category: Category }) {
   );
 
   return (
-    <>
-      <section className="hero" aria-labelledby="hero-title">
-        <div className="hero-copy">
-          <span className="hero-kicker">
-            <span />
-            ソルビファイのデザインシステム
-          </span>
-          <h1 id="hero-title">SolvifAI UI</h1>
-          <p>
-            SolvifAI v2の基本コンポーネントとUIの使い方。
-            <br className="hero-break" />
-            企画のモックから実装まで、同じUIを使えます。
-          </p>
-          <div className="hero-links">
-            <a className="hero-primary" href="#catalog-list">
-              カタログを見る
-              <ArrowDown size={16} />
-            </a>
-            <a className="hero-secondary" href="#guidelines">
-              UIガイド
-              <ArrowUpRight size={15} />
-            </a>
-          </div>
+    <section id="catalog-list" className="directory" aria-labelledby="directory-title">
+      <div className="section-heading">
+        <div>
+          <h1 id="directory-title">コンポーネント</h1>
+          <p>実際に操作して、使い分けとコード例を確認できます。</p>
         </div>
-        <HeroPreview />
-      </section>
-      <section id="catalog-list" className="directory" aria-labelledby="directory-title">
-        <div className="section-heading">
-          <div>
-            <h2 id="directory-title">コンポーネント</h2>
-            <p>実際に操作して、使い分けとコード例を確認できます。</p>
-          </div>
-          <SearchInput
-            className="catalog-search"
-            value={query}
-            onChange={setQuery}
-            ariaLabel="コンポーネントを検索"
-            placeholder="コンポーネントを検索"
-          />
-        </div>
-        <nav className="filters" aria-label="コンポーネントの分類">
-          {categories.map((item) => (
-            <a
-              key={item}
-              href={categoryLinks[item]}
-              aria-current={item === category ? "true" : undefined}
-            >
-              {item}
-            </a>
+        <SearchInput
+          className="catalog-search"
+          value={query}
+          onChange={setQuery}
+          ariaLabel="コンポーネントを検索"
+          placeholder="コンポーネントを検索"
+        />
+      </div>
+      <nav className="filters" aria-label="コンポーネントの分類">
+        {categories.map((item) => (
+          <a
+            key={item}
+            href={categoryLinks[item]}
+            aria-current={item === category ? "true" : undefined}
+          >
+            {item}
+          </a>
+        ))}
+        <span role="status" className="result-count">
+          {visible.length}件
+        </span>
+      </nav>
+      {visible.length ? (
+        <div className="component-grid">
+          {visible.map((entry) => (
+            <article className="component-card" key={entry.id}>
+              <div className="card-preview" aria-hidden="true" inert>
+                <CardPreview id={entry.id} />
+              </div>
+              <div className="card-content">
+                <div className="card-meta">
+                  <span className="card-icon">
+                    <entry.icon size={16} />
+                  </span>
+                  {entry.category}
+                </div>
+                <h3>
+                  <a href={"#" + entry.id}>
+                    {entry.label}
+                    <ArrowUpRight size={18} aria-hidden="true" />
+                  </a>
+                </h3>
+                <span className="component-name">{entry.name}</span>
+                <p>{entry.description}</p>
+              </div>
+            </article>
           ))}
-          <span role="status" className="result-count">
-            {visible.length}件
-          </span>
-        </nav>
-        {visible.length ? (
-          <div className="component-grid">
-            {visible.map((entry) => (
-              <article className="component-card" key={entry.id}>
-                <div className="card-preview" aria-hidden="true" inert>
-                  <CardPreview id={entry.id} />
-                </div>
-                <div className="card-content">
-                  <div className="card-meta">
-                    <span className="card-icon">
-                      <entry.icon size={16} />
-                    </span>
-                    {entry.category}
-                  </div>
-                  <h3>
-                    <a href={"#" + entry.id}>
-                      {entry.label}
-                      <ArrowUpRight size={18} aria-hidden="true" />
-                    </a>
-                  </h3>
-                  <span className="component-name">{entry.name}</span>
-                  <p>{entry.description}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <SimpleEmptyState
-            message="一致するコンポーネントがありません"
-            subMessage="別のキーワードや分類を試してください。"
-          />
-        )}
-      </section>
-    </>
+        </div>
+      ) : (
+        <SimpleEmptyState
+          message="一致するコンポーネントがありません"
+          subMessage="別のキーワードや分類を試してください。"
+        />
+      )}
+    </section>
   );
 }
 
@@ -428,11 +400,7 @@ export function App() {
   useEffect(() => {
     if (title) document.getElementById("content")?.focus({ preventScroll: true });
     document.title = title ? `${title} | SolvifAI UI` : "SolvifAI UI";
-    if (hash === "#catalog-list" || hash.startsWith("#category-")) {
-      document.getElementById("catalog-list")?.scrollIntoView();
-    } else {
-      window.scrollTo(0, 0);
-    }
+    window.scrollTo(0, 0);
   }, [hash, title]);
 
   let content = <Catalog category={category} />;

@@ -1,4 +1,4 @@
-import { ArrowLeft, FileText, Plus } from "lucide-react";
+import { ArrowLeft, FileText } from "lucide-react";
 import { useId, useLayoutEffect, useRef, useState } from "react";
 
 import { AppButton } from "../ui/AppButton";
@@ -1022,33 +1022,4 @@ export function CardPreview({ id }: { id: keyof typeof previews }) {
         <QueryError error={new Error("サンプルを取得できませんでした。")} retry={() => {}} />
       );
   }
-}
-
-export function HeroPreview() {
-  return (
-    <div className="hero-illustration" aria-hidden="true" inert>
-      <div className="hero-sheet">
-        <div className="hero-sheet-title">
-          <FileText size={19} />
-          <strong>資料一覧</strong>
-        </div>
-        <SearchInput value="" onChange={() => {}} placeholder="資料名で検索" />
-        <div className="hero-sheet-row">
-          <Checkbox checked onChange={() => {}} />
-          <span>月次レポート</span>
-          <Badge label="完了" color="green" />
-        </div>
-        <div className="hero-sheet-row">
-          <Checkbox checked={false} onChange={() => {}} />
-          <span>プロジェクト計画書</span>
-          <Badge label="下書き" color="gray" />
-        </div>
-      </div>
-      <div className="hero-sheet-action">
-        <AppButton variant="primary" iconLeft={<Plus size={16} />} className="!px-5">
-          資料を追加
-        </AppButton>
-      </div>
-    </div>
-  );
 }
