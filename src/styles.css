@@ -201,7 +201,7 @@ button:not(:disabled) {
   background: #287ada;
 }
 .hero h1 {
-  font-size: clamp(48px, 6.4vw, 94px);
+  font-size: clamp(32px, 4vw, 48px);
   font-weight: 760;
   line-height: 1.03;
   letter-spacing: -0.075em;
@@ -497,9 +497,10 @@ button:not(:disabled) {
   font-weight: 700;
 }
 .document-heading h1 {
-  font-size: clamp(31px, 5vw, 55px);
+  font-size: clamp(26px, 2.8vw, 32px);
   letter-spacing: -0.035em;
   font-weight: 760;
+  line-height: 1.25;
 }
 .document-heading code {
   display: inline-block;
@@ -801,9 +802,6 @@ button:not(:disabled) {
   .hero {
     padding-inline: 26px;
   }
-  .hero h1 {
-    font-size: clamp(48px, 7vw, 76px);
-  }
 }
 
 @media (max-width: 825px) {
@@ -839,9 +837,6 @@ button:not(:disabled) {
   .hero {
     min-height: 300px;
   }
-  .hero h1 {
-    font-size: clamp(48px, 9vw, 76px);
-  }
 }
 
 @media (max-width: 600px) {
@@ -849,9 +844,6 @@ button:not(:disabled) {
     grid-template-columns: 1fr;
     gap: 25px;
     padding: 27px 23px 35px;
-  }
-  .hero h1 {
-    font-size: clamp(49px, 12vw, 66px);
   }
   .hero-break {
     display: none;
