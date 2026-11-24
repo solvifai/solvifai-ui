@@ -121,8 +121,31 @@ button:not(:disabled) {
   color: var(--color-catalog-muted);
   letter-spacing: 0.09em;
 }
-.sidebar-label:not(:first-child) {
+.sidebar-group {
   margin-top: 17px;
+}
+.sidebar-group > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+  padding-block: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  list-style: none;
+}
+.sidebar-group > summary::-webkit-details-marker {
+  display: none;
+}
+.sidebar-group > summary:hover {
+  background: #f3f7fc;
+}
+.sidebar-group:not([open]) > summary svg {
+  transform: rotate(-90deg);
+}
+.sidebar-group-links {
+  display: grid;
+  gap: 4px;
 }
 .sidebar a {
   display: flex;

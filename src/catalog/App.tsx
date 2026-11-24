@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   BookOpen,
   Check,
+  ChevronDown,
   Command,
   Copy,
   Github,
@@ -65,30 +66,44 @@ function Sidebar({ hash, isOpen, close }: { hash: string; isOpen: boolean; close
             {label}
           </a>
         ))}
-        <div className="sidebar-label">Patterns</div>
-        {patterns.map(({ href, label, icon: Icon }) => (
-          <a
-            key={href}
-            href={href}
-            aria-current={hash === href ? "page" : undefined}
-            onClick={close}
-          >
-            <Icon size={16} aria-hidden="true" />
-            {label}
-          </a>
-        ))}
-        <div className="sidebar-label">コンポーネント</div>
-        {components.map(({ id, label, icon: Icon }) => (
-          <a
-            key={id}
-            href={"#" + id}
-            aria-current={hash === "#" + id ? "page" : undefined}
-            onClick={close}
-          >
-            <Icon size={16} aria-hidden="true" />
-            {label}
-          </a>
-        ))}
+        <details className="sidebar-group" open>
+          <summary className="sidebar-label">
+            Patterns
+            <ChevronDown size={14} aria-hidden="true" />
+          </summary>
+          <div className="sidebar-group-links">
+            {patterns.map(({ href, label, icon: Icon }) => (
+              <a
+                key={href}
+                href={href}
+                aria-current={hash === href ? "page" : undefined}
+                onClick={close}
+              >
+                <Icon size={16} aria-hidden="true" />
+                {label}
+              </a>
+            ))}
+          </div>
+        </details>
+        <details className="sidebar-group" open>
+          <summary className="sidebar-label">
+            コンポーネント
+            <ChevronDown size={14} aria-hidden="true" />
+          </summary>
+          <div className="sidebar-group-links">
+            {components.map(({ id, label, icon: Icon }) => (
+              <a
+                key={id}
+                href={"#" + id}
+                aria-current={hash === "#" + id ? "page" : undefined}
+                onClick={close}
+              >
+                <Icon size={16} aria-hidden="true" />
+                {label}
+              </a>
+            ))}
+          </div>
+        </details>
       </nav>
     </aside>
   );
