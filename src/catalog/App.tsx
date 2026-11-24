@@ -19,7 +19,6 @@ import { useEffect, useState } from "react";
 
 import { SearchInput } from "../ui/SearchInput";
 import { SimpleEmptyState } from "../ui/EmptyState";
-import { SimpleBreadcrumb } from "../ui/SimpleBreadcrumb";
 import { categories, components, type Category, type ComponentEntry } from "./components";
 import guide from "./guidelines.md?raw";
 import guideUrl from "./guidelines.md?url&no-inline";
@@ -216,9 +215,6 @@ function Detail({ entry }: { entry: ComponentEntry }) {
   const Preview = previews[entry.id];
   return (
     <div className="document-page">
-      <SimpleBreadcrumb
-        items={[{ label: "コンポーネント", href: "#components" }, { label: entry.label }]}
-      />
       <header className="document-heading">
         <h1>{entry.label}</h1>
         <code>{entry.name}</code>
