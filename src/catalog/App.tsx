@@ -87,7 +87,7 @@ function Sidebar({ hash, isOpen, close }: { hash: string; isOpen: boolean; close
         </details>
         <details className="sidebar-group" open>
           <summary className="sidebar-label">
-            コンポーネント
+            Components
             <ChevronDown size={14} aria-hidden="true" />
           </summary>
           <div className="sidebar-group-links">
