@@ -220,10 +220,6 @@ function Detail({ entry }: { entry: ComponentEntry }) {
         items={[{ label: "コンポーネント", href: "#components" }, { label: entry.label }]}
       />
       <header className="document-heading">
-        <span className="document-kicker">
-          <entry.icon size={18} />
-          {entry.category}
-        </span>
         <h1>{entry.label}</h1>
         <code>{entry.name}</code>
         <p>{entry.description}</p>
@@ -287,10 +283,6 @@ function Tokens() {
   return (
     <div className="document-page">
       <header className="document-heading">
-        <span className="document-kicker">
-          <Palette size={18} />
-          基本要素
-        </span>
         <h1>デザイントークン</h1>
         <p>SolvifAIの画面で使う、色と文字の基本値です。</p>
       </header>
@@ -338,10 +330,6 @@ function Guidelines() {
   return (
     <div className="document-page">
       <header className="document-heading">
-        <span className="document-kicker">
-          <BookOpen size={18} />
-          企画・実装・レビュー
-        </span>
         <h1>UIガイド</h1>
         <p>SolvifAI v2の画面を作るときに、人とAIで共有するルールです。</p>
       </header>

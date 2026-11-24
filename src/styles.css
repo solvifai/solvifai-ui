@@ -369,15 +369,6 @@ button:not(:disabled) {
   padding: 15px 0 21px;
   margin-top: 5px;
 }
-.document-kicker {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 7px;
-  color: var(--color-catalog-blue);
-  font-size: 13px;
-  font-weight: 700;
-}
 .document-heading h1 {
   font-size: clamp(26px, 2.8vw, 32px);
   letter-spacing: -0.035em;

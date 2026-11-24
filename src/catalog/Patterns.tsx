@@ -61,16 +61,13 @@ export const patterns = [
 ];
 
 export function PatternPage({
-  pattern: { label, icon: Icon, description, demo, source },
+  pattern: { label, description, demo, source },
 }: {
   pattern: (typeof patterns)[number];
 }) {
   return (
     <div className="document-page">
       <header className="document-heading">
-        <span className="document-kicker">
-          <Icon size={18} aria-hidden="true" /> Patterns
-        </span>
         <h1>{label}</h1>
         <p>{description}</p>
       </header>

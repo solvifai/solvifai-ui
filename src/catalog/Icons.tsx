@@ -1,4 +1,4 @@
-import { ArrowDownToLine, ArrowUpRight, Shapes } from "lucide-react";
+import { ArrowDownToLine, ArrowUpRight } from "lucide-react";
 
 import { useState } from "react";
 
@@ -46,9 +46,6 @@ export function Icons({ sourceBase }: { sourceBase: string }) {
   return (
     <div className="document-page">
       <header className="document-heading">
-        <span className="document-kicker">
-          <Shapes size={18} aria-hidden="true" /> 基本要素
-        </span>
         <h1>SolvifAIアイコン</h1>
         <p>SolvifAIのブランド素材と、製品画面で使っている共通アイコンです。</p>
       </header>
